@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1654547065 source:c:\users\pale\documents\facultad\primer cuatrimestre\programacion y laboratorio\codeblock\tpfinal\tpfinal_dotti_palena\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"sistema.h"
+
+1654547065 c:\users\pale\documents\facultad\primer cuatrimestre\programacion y laboratorio\codeblock\tpfinal\tpfinal_dotti_palena\sistema.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+
