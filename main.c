@@ -34,10 +34,6 @@ idcliente
 
 int main()
 {
-    stCliente aux;
-    aux = CargarUnCliente (aux);
-    MostrarUnCliente (aux);
-
 
     return 0;
 }
