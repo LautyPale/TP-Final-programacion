@@ -12,3 +12,19 @@
 	<string.h>
 	<ctype.h>
 
+1655325262 source:c:\users\pale\documents\facultad\primer cuatrimestre\programacion y laboratorio\tpfinal\tpfinal_dotti_palena\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"Sistema.h"
+
+1655325276 c:\users\pale\documents\facultad\primer cuatrimestre\programacion y laboratorio\tpfinal\tpfinal_dotti_palena\sistema.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+
+1655321828 source:c:\users\pale\documents\facultad\primer cuatrimestre\programacion y laboratorio\tpfinal\tpfinal_dotti_palena\sistema.c
+	"Sistema.h"
+

@@ -2,9 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "sistema.h"
-
-
+#include "Sistema.h"
 
 int main()
 {
@@ -12,6 +10,9 @@ int main()
     return 0;
 }
 
+/// Menu opciones ///
+
+/*
 void menuOpciones ()
 {
     int opcion = -1;
@@ -229,7 +230,7 @@ void menuOpciones ()
         }
     }
 }
-
+*/
 
 
 

@@ -1,38 +1,10 @@
-#include "sistema.h"
+#include "Sistema.h"
 
 ///-------------------------------------------------------------- CONSTANTES --------------------------------------------------------------///
 
 const char archivoClientes[] = "Clientes";
 const char archivoProductos[] = "Productos";
 const char archivoPedidos[] = "Pedidos";
-
-///-------------------------------------------------------------- ESTRUCTURAS --------------------------------------------------------------///
-
-typedef struct{
-char nombre[30];
-char apellido[30];
-char mail[40]; /// 0 a 255 ASCII | especificador de formato: %c
-unsigned long int telefono; /// 0 a 4,294,967,295 | especificador de formato: %lu
-int dni;
-char calleDireccion[50];
-int calleNumero;
-int idCliente;
-int bajaCliente;
-}stCliente;
-
-typedef struct{
-char nombreproducto[30];
-int idproducto;
-float precioproducto;
-}stProducto;
-
-typedef struct{
-char descripcion[70];
-float costopedido;
-int idpedido;
-char fechapedido[10];
-int pedidoanulado;
-}stPedido;
 
 ///-------------------------------------------------------------- FUNCIONES DE CLIENTES --------------------------------------------------------------///
 
@@ -43,6 +15,7 @@ void altaCliente ()
     stCliente nuevo;
     int cantClientes = 0;
     int i = 0;
+    int flag = 0;
 
     if (buffer != NULL)
     {
@@ -54,21 +27,36 @@ void altaCliente ()
             printf("Ingrese el DNI del cliente: ");
             scanf("%d", &nuevo.dni);
 
-            while ( (fread (&aux, sizeof(stCliente), 1, buffer) ) > 0)
+            while ( (fread (&aux, sizeof(stCliente), 1, buffer) ) > 0 && flag == 0)
             {
                 if (nuevo.dni == aux.dni)
                 {
-                    printf("El cliente ya existe");
-                }
-                else
-                {
-                    nuevo = cargarCliente(&nuevo.dni);
-                    fwrite(&nuevo, sizeof(stCliente), 1, buffer);
+                    flag = 1;
                 }
             }
 
-            system("cls");
+            if(flag == 1)
+            {
+                printf("\nEl cliente ya existe.\n");
+            }
+            else
+            {
+
+                fseek(buffer, sizeof(stCliente)*(-1), SEEK_END);
+                if  ( (fread(&aux, sizeof(stCliente), 1, buffer) ) > 0 )
+                {
+                    nuevo.idCliente = aux.idCliente + 1;
+                }
+                else
+                {
+                    nuevo.idCliente = 1;
+                }
+
+                nuevo = cargarCliente(nuevo);
+                fwrite(&nuevo, sizeof(stCliente), 1, buffer);
+            }
         }
+        system("cls");
         fclose(buffer);
     }
     else
@@ -77,14 +65,8 @@ void altaCliente ()
     }
 }
 
-stCliente cargarCliente(int *dni)
+stCliente cargarCliente(stCliente cliente)
 {
-    stCliente cliente;
-
-    cliente.dni = (*dni);
-
-    printf("Ingrese el ID: ");
-    scanf("%d", &cliente.idCliente);
 
     printf("Ingrese el nombre del cliente: ");
     fflush(stdin);
@@ -108,7 +90,7 @@ stCliente cargarCliente(int *dni)
     printf("Ingrese la direccion del cliente (numero): ");
     scanf("%d", &cliente.calleNumero);
 
-    cliente.bajaCliente = 0;
+    cliente.bajaCliente = 0; /// 0 = activo
 
     return cliente;
 }
@@ -117,15 +99,20 @@ int bajaCliente (int idCliente)
 {
     FILE *buffer = fopen(archivoClientes, "r+b");
     stCliente aux;
-    aux.bajaCliente = 1;
+    aux.bajaCliente = 1; /// 1 = baja
     int flag = 0;
+
     if (buffer != NULL)
     {
-        while (fread(&aux, sizeof(stCliente), 1, buffer) > 0 || idCliente == aux.idCliente)
+        while (fread(&aux, sizeof(stCliente), 1, buffer) > 0 && flag == 0)
         {
-            fseek(buffer, stCliente*(-1), SEEK_CUR);
-            fwrite(&aux.bajaCliente, sizeof(stCliente), 1, buffer);
-            flag = 1;
+            if (idCliente == aux.idCliente)
+            {
+                fseek(buffer, sizeof(stCliente)*(-1), SEEK_CUR);
+                aux = darDeBaja (aux);
+                fwrite(&aux, sizeof(stCliente), 1, buffer);
+                flag = 1;
+            }
         }
         fclose(buffer);
     }
@@ -133,8 +120,180 @@ int bajaCliente (int idCliente)
     return flag;
 }
 
-///-------------------------------------------------------------- FUNCIONES DE PEDIDOS --------------------------------------------------------------///
+stCliente darDeBaja (stCliente cliente)
+{
+    cliente.bajaCliente = 1; /// dar de baja
+    return cliente;
+}
 
+stCliente ModificarUnClienteAuxiliar (stCliente cliente)
+{
+    char control = 's';
+
+    printf("Modificar nombre? s/n: ");
+    fflush(stdin);
+    scanf("%c", &control);
+    if(control=='s')
+    {
+        printf("Ingrese nombre: ");
+        fflush(stdin);
+        gets(cliente.nombre);
+    }
+
+    printf("Modificar apellido? s/n: ");
+    fflush(stdin);
+    scanf("%c", &control);
+    if(control=='s')
+    {
+        printf("Ingrese nombre: ");
+        fflush(stdin);
+        gets(cliente.apellido);
+    }
+
+    printf("Modificar mail? s/n: ");
+    fflush(stdin);
+    scanf("%c", &control);
+    if(control=='s')
+    {
+        printf("Ingrese el mail: ");
+        fflush(stdin);
+        gets(cliente.mail);
+    }
+
+    printf("Modificar telefono? s/n: ");
+    fflush(stdin);
+    scanf("%c", &control);
+    if(control=='s')
+    {
+        printf("Ingrese telefono: ");
+        scanf("%lu", &cliente.telefono);
+    }
+
+    printf("Modificar DNI? s/n: ");
+    fflush(stdin);
+    scanf("%c", &control);
+    if(control=='s')
+    {
+        printf("Ingrese DNI: ");
+        scanf("%i", &cliente.dni);
+    }
+
+    printf("Modificar direccion (calle)? s/n: ");
+    fflush(stdin);
+    scanf("%c", &control);
+    if(control=='s')
+    {
+        printf("Ingrese la calle: ");
+        fflush(stdin);
+        gets(cliente.calleDireccion);
+    }
+
+    printf("Modificar direccion (numero)? s/n: ");
+    fflush(stdin);
+    scanf("%c", &control);
+    if(control=='s')
+    {
+        printf("Ingrese el numero de la direccion: ");
+        scanf("%i", &cliente.calleNumero);
+    }
+
+    return cliente;
+}
+
+void BuscarYModificarUnCliente (int dni)
+{
+    FILE *buf = fopen(archivoClientes, "r+b");
+    stCliente cliente;
+    int pos = 0;
+
+    if(!buf)
+    {
+        printf("El archivo no se puede abrir.\n");
+    }
+    else
+    {
+        pos = BuscarDni(buf, dni);
+        fseek(buf, sizeof(stCliente)*(pos), 0);
+        fread(&cliente, sizeof(stCliente), 1, buf);
+
+        cliente = ModificarUnClienteAuxiliar (cliente);
+
+        fseek(buf, sizeof(stCliente)*(-1), 1);
+        fwrite(&cliente, sizeof(stCliente), 1, buf);
+
+        fclose(buf);
+    }
+}
+
+int BuscarDni (FILE* buf, int dni)
+{
+    stCliente aux;
+    int i = 0;
+    int flag = 0;
+
+    while ( (fread(&aux, sizeof(stCliente), 1, buf) ) > 0 && flag == 0)
+    {
+        if (dni == aux.dni)
+        {
+            flag = 1;
+        }
+        i++;
+    }
+    return i-1;
+}
+
+/// Listar Clientes
+
+/// Nombre y apellido (insercion)
+/*
+void InsertarDatoEnArregloOrdenadoPorNombre (stAlumno a[], int validos, stAlumno inser)
+{
+    int i=validos;
+
+    while (i>=0 && strcmpi(a[i].nombre,inser.nombre) > 0)
+    {
+        a[i+1]=a[i];
+        i--;
+    }
+    a[i+1] = inser;
+}
+
+void OrdenamientoPorInsercion (stAlumno a[], int validos)
+{
+    int i=0;
+
+    while(i<validos-1)
+    {
+        InsertarDatoEnArregloOrdenadoPorNombre(a, i, a[i+1]);
+        i++;
+    }
+}
+*/
+/// DNI (seleccion)
+/*
+void OrdenarPorId ()
+{
+
+}
+
+int BuscarPosicionMenorMatricula (int )
+{
+    int menor = a[i].matricula;
+    int posmenor = i;
+
+    for(i=i+1; i<validos; i++)
+    {
+        if(menor > a[i].matricula)
+        {
+            menor = a[i].matricula;
+            posmenor = i;
+        }
+    }
+    return posmenor;
+}
+*/
+///-------------------------------------------------------------- FUNCIONES DE PEDIDOS --------------------------------------------------------------///
+/*
 void altaPedido (int idCliente)
 {
     FILE *bufferPedido = fopen(archivoPedidos, "rb"); /// abro el archivo de pedidos para agregar algun pedido si se cumple el while de abajo
@@ -177,9 +336,9 @@ stPedido cargarPedido (stPedido pedido, int idCliente)
 {
     return pedido;
 }
-
+*/
 ///-------------------------------------------------------------- FUNCIONES DE PRODUCTOS --------------------------------------------------------------///
-
+/*
 stProducto tiposProductos (stProducto producto)
 {
     printf("Ingrese el nombre del producto: ");
@@ -226,4 +385,5 @@ void crearProducto ()
     }
     fclose(buffer);
 }
-
+*/
+/// LINEA 230 PRUEBA MAXI
