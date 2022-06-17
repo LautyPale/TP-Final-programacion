@@ -1,5 +1,8 @@
 #include "Sistema.h"
 
+/// PRUEBA MAXI
+/// 16 de Junio 22:35
+
 ///-------------------------------------------------------------- CONSTANTES --------------------------------------------------------------///
 
 const char archivoClientes[] = "Clientes";
@@ -386,4 +389,4 @@ void crearProducto ()
     fclose(buffer);
 }
 */
-/// LINEA 230 PRUEBA MAXI
+
