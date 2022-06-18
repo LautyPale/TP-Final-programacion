@@ -29,17 +29,32 @@ typedef struct{
 char descripcion[70];
 float costopedido;
 int idpedido;
-char fechapedido[10];
-int pedidoanulado;
+int diaPedido;
+int mesPedido;
+int anioPedido;
+int pedidoanulado; /// 0 activo, 1 pedido anulado
+int idCliente; /// para poder listar todos los pedidos de un cliente en especifico
 }stPedido;
 
 ///-------------------------------------------------------------- Prototipado --------------------------------------------------------------///
 
+/// Clientes ///
 void altaCliente ();
 stCliente cargarCliente();
 int bajaCliente (int idCliente);
 stCliente ModificarUnClienteAuxiliar (stCliente cliente);
 void BuscarYModificarUnCliente (int pos);
-void altaPedido (int idCliente);
 int BuscarDni (FILE* buf, int dni);
 stCliente darDeBaja (stCliente cliente);
+
+/// Pedidos ///
+
+void altaPedido (int idCliente);
+stPedido cargarPedido (stPedido pedido);
+int bajaPedido (int idPedido);
+stPedido darDeBajaPedido (stPedido pedido);
+stPedido modificarUnPedido (stPedido pedido);
+stPedido buscarYmodificarPedido (int idPedido);
+int buscarIdPedido (FILE *buffer, int idPedido);
+void mostrarUnPedido (stPedido pedido);
+void MostrarPedidosDeUnCliente (int idCliente);
