@@ -200,11 +200,12 @@ stCliente ModificarUnClienteAuxiliar (stCliente cliente)
     return cliente;
 }
 
-void BuscarYModificarUnCliente (int dni)
+int BuscarYModificarUnCliente (int dni)
 {
     FILE *buf = fopen(archivoClientes, "r+b");
     stCliente cliente;
     int pos = 0;
+    int flag = 0;
 
     if(!buf)
     {
@@ -212,17 +213,24 @@ void BuscarYModificarUnCliente (int dni)
     }
     else
     {
-        pos = BuscarDni(buf, dni);
-        fseek(buf, sizeof(stCliente)*(pos), 0);
-        fread(&cliente, sizeof(stCliente), 1, buf);
+        while ( (fread(&cliente, sizeof(stCliente), 1, buf) ) > 0 && dni != cliente.dni)
+        {
+            if (dni == cliente.dni)
+            {
+                pos = BuscarDni(buf, dni);
+                fseek(buf, sizeof(stCliente)*(pos), 0);
+                fread(&cliente, sizeof(stCliente), 1, buf);
 
-        cliente = ModificarUnClienteAuxiliar (cliente);
+                cliente = ModificarUnClienteAuxiliar (cliente);
 
-        fseek(buf, sizeof(stCliente)*(-1), 1);
-        fwrite(&cliente, sizeof(stCliente), 1, buf);
-
+                fseek(buf, sizeof(stCliente)*(-1), 1);
+                fwrite(&cliente, sizeof(stCliente), 1, buf);
+                flag = 1;
+            }
+        }
         fclose(buf);
     }
+    return flag;
 }
 
 int BuscarDni (FILE* buf, int dni)
@@ -559,139 +567,67 @@ void mostrarUnPedido (stPedido pedido)
     }
 }
 
-/// Pasar de Archivo a Arreglo
-/*
-void archivoAarreglo ()
-{
-    /// Pasaje de Archivo a Arreglo
-
-    FILE *buffer = fopen(archivoPedidos, "rb");
-    stPedido aux;
-    int i = 0;
-    int registros = 0;
-    int validos = 0;
-
-    if (buffer != NULL)
-    {
-        fseek(buffer, 0, 2);
-        registros = ( ftell(buffer) ) / ( sizeof(stPedido) );
-    }
-    else
-    {
-        printf("El archivo no pudo ser abierto");
-    }
-
-    validos = registros;
-    stPedido pedidos[validos];
-    fseek(buffer, 0, 0);
-
-    while (i < validos)
-    {
-        fread(&aux, sizeof(stPedido), 1, buffer);
-        pedidos[i] = aux;
-    }
-
-    fclose(buffer);
-}
-*/
-
 /// Fecha ///
 
-/*
 void ordenarPorFecha ()
 {
-    /// Pasaje de Archivo a Arreglo
+    FILE * buffer = fopen(archivoPedidos, "rb");
 
-    FILE *buffer = fopen(archivoPedidos, "rb");
+    int posmenor;
     stPedido aux;
     int i = 0;
-    int registros = 0;
-    int validos = 0;
 
-    if (buffer != NULL)
+    int validos = contarRegistrosPedidos(buffer);
+    stPedido arregloPedidos[validos];
+    while (i < validos)
     {
-        fseek(buffer, 0, 2);
-        registros = ( ftell(buffer) ) / ( sizeof(stPedido) );
+        arregloPedidos[i] = CopiarPedidosAarreglo(buffer, i);
     }
-    else
-    {
-        printf("El archivo no pudo ser abierto");
-    }
-
-    validos = registros;
-    stPedido pedidos[validos];
-    fseek(buffer, 0, 0);
 
     while (i < validos)
     {
-        fread(&aux, sizeof(stPedido), 1, buffer);
-        pedidos[i] = aux;
-    }
-
-    fclose(buffer);
-
-    /// ordenar Arreglo ///
-
-    int posmenor;
-    int aux;
-    i = 0;
-
-    while (i < validos - 1)
-    {
-        posmenor = elegirFechaMenor(pedidos, i, validos);
-        aux = pedidos[posmenor];
-        pedidos[posmenor] = pedidos[i];
-        pedidos[i] = aux;
+        posmenor = fechaMenor(arregloPedidos, i, validos);
+        aux = arregloPedidos[posmenor];
+        arregloPedidos[posmenor] = arregloPedidos[i];
+        arregloPedidos[i] = aux;
         i++;
     }
+    fclose(buffer);
 }
 
-int elegirFechaMenor (stPedido pedidos[], int pos, int validos)
+int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
 {
-    int menor = pedidos[pos].diaPedido;
+    stPedido menor = arregloPedidos[pos];
     int posmenor = pos;
     int i = pos + 1;
 
-
-    while (i < validos) /// Elige el dia menor y ordena los pedidos
+    while (i < validos)
     {
-        if (menor > pedidos[i].diaPedido)
+        if (menor.anioPedido > arregloPedidos[i].anioPedido)
         {
-            menor = pedidos[i];
+            menor = arregloPedidos[i];
             posmenor = i;
         }
-        i++
-    }
-
-    i = pos + 1;
-    menor = pedidos[pos].mesPedido;
-
-    while (i < validos) /// Vuelve a ordenar los pedidos pero ahora por mes
-    {
-        if (menor > pedidos[i].mesPedido)
+        else if (menor.anioPedido == arregloPedidos[i].anioPedido)
         {
-            menor = pedidos[i];
-            posmenor = i;
+            if (menor.mesPedido > arregloPedidos[i].mesPedido)
+            {
+                menor = arregloPedidos[i];
+                posmenor = i;
+            }
+            else if (menor.mesPedido == arregloPedidos[i].mesPedido)
+            {
+                if (menor.diaPedido > arregloPedidos[i].mesPedido)
+                {
+                    menor = arregloPedidos[i];
+                    posmenor = i;
+                }
+            }
         }
-        i++
     }
-
-    i = pos + 1;
-    menor = pedidos[pos].anioPedido;
-
-    while (i < validos) /// Vuelve a ordenar los pedidos pero ahora por año
-    {
-        if (menor > pedidos[i].anioPedido)
-        {
-            menor = pedidos[i];
-            posmenor = i;
-        }
-        i++
-    }
-
-    return posmenor /// posicion en el arreglo con menor dia, mes y año
+    return posmenor;
 }
-*/
+
 /// Clientes ///
 
 void MostrarPedidosDeUnCliente (int idCliente)
@@ -736,6 +672,81 @@ void PeorCliente ()
 
 }
 */
+
+///-------------------------------------------------------------- FUNCIONES AUXILIARES --------------------------------------------------------------///
+
+/// Pasar de archivo de pedidos a arreglo de pedidos para ordenar
+
+int contarRegistrosPedidos (FILE *buffer)
+{
+    stPedido aux;
+    int i = 0;
+
+    if (!buffer)
+    {
+        printf("\nEl archivo no se pudo abrir.\n");
+    }
+    else
+    {
+        while ( (fread(&aux, sizeof(stPedido), 1, buffer) ) > 0)
+        {
+            i++;
+        }
+    }
+
+    return i;
+}
+
+stPedido CopiarPedidosAarreglo (FILE *buffer, int i)
+{
+    stPedido pedido;
+
+    fseek(buffer, (sizeof(stPedido)*i), 0);
+    fread(&pedido, sizeof(stPedido), 1, buffer);
+
+    return pedido;
+}
+
+/// Pasar de archivo de clientes a arreglo de clientes para ordenar
+
+int contarRegistrosClientes (FILE *buffer)
+{
+    stCliente aux;
+    int i = 0;
+
+    if (!buffer)
+    {
+        printf("\nEl archivo no se pudo abrir.\n");
+    }
+    else
+    {
+        while ( (fread(&aux, sizeof(stCliente), 1, buffer) ) > 0)
+        {
+            i++;
+        }
+    }
+
+    return i;
+}
+
+stCliente CopiarClientesAarreglo (stCliente clienteord[])
+{
+    FILE * buf = fopen(archivoClientes, "rb");
+    int i = 0;
+    stCliente cliente;
+
+    if(!buf){
+        printf("\nEL ARCHIVO NO SE PUEDE ABRIR\n");
+    }
+    else{
+        while((fread(&cliente, sizeof(stCliente), 1, buf)) > 0){
+            clienteord[i] = cliente;
+            i++;
+        }
+        fclose(buf);
+    }
+    return cliente;
+}
 
 ///-------------------------------------------------------------- FUNCIONES DE PRODUCTOS --------------------------------------------------------------///
 /*

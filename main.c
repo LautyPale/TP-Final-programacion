@@ -92,7 +92,7 @@ void menuOpciones ()
                             }
                             else
                             {
-                                printf("\nCliende dado de baja exitosamente.\n");
+                                printf("\nCliente dado de baja exitosamente.\n");
                             }
                             idCliente = -1;
                             break;
@@ -102,7 +102,16 @@ void menuOpciones ()
                         {
                             printf("Ingrese el DNI del cliente: ");
                             scanf("%d", &DNICliente);
-                            BuscarYModificarUnCliente(DNICliente);
+                            flag = BuscarYModificarUnCliente(DNICliente);
+                            if (flag == 0)
+                            {
+                                printf("\nNo se pudo encontrar el cliente buscado o el DNI es incorrecto.\n");
+                            }
+                            else
+                            {
+                                printf("\nCliente modificado exitosamente.\n");
+                            }
+                            DNICliente = -1;
                             break;
                         }
 

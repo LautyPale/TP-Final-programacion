@@ -43,7 +43,7 @@ void altaCliente (int cantClientes);
 stCliente cargarCliente();
 int bajaCliente (int idCliente);
 stCliente ModificarUnClienteAuxiliar (stCliente cliente);
-void BuscarYModificarUnCliente (int pos);
+int BuscarYModificarUnCliente (int dni);
 int BuscarDni (FILE* buf, int dni);
 stCliente darDeBaja (stCliente cliente);
 
@@ -58,4 +58,6 @@ stPedido buscarYmodificarPedido (int idPedido);
 int buscarIdPedido (FILE *buffer, int idPedido);
 void mostrarUnPedido (stPedido pedido);
 void MostrarPedidosDeUnCliente (int idCliente);
-void archivoAarreglo ();
+int contarRegistrosPedidos (FILE *buffer);
+int fechaMenor (stPedido arregloPedidos[], int pos, int validos);
+stPedido CopiarPedidosAarreglo (FILE *buffer, int i);
