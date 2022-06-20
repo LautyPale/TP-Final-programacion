@@ -39,7 +39,7 @@ int idCliente; /// para poder listar todos los pedidos de un cliente en especifi
 ///-------------------------------------------------------------- Prototipado --------------------------------------------------------------///
 
 /// Clientes ///
-void altaCliente ();
+void altaCliente (int cantClientes);
 stCliente cargarCliente();
 int bajaCliente (int idCliente);
 stCliente ModificarUnClienteAuxiliar (stCliente cliente);
@@ -58,3 +58,4 @@ stPedido buscarYmodificarPedido (int idPedido);
 int buscarIdPedido (FILE *buffer, int idPedido);
 void mostrarUnPedido (stPedido pedido);
 void MostrarPedidosDeUnCliente (int idCliente);
+void archivoAarreglo ();

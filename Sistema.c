@@ -12,20 +12,16 @@ const int ANIO = 2022;
 
 ///-------------------------------------------------------------- FUNCIONES DE CLIENTES --------------------------------------------------------------///
 
-void altaCliente ()
+void altaCliente (int cantClientes)
 {
     FILE *buffer = fopen(archivoClientes, "a+b");
     stCliente aux;
     stCliente nuevo;
-    int cantClientes = 0;
     int i = 0;
     int flag = 0;
 
     if (buffer != NULL)
     {
-        printf("Cuantos clientes desea cargar: ");
-        scanf("%d", &cantClientes);
-
         for (i = 0; i < cantClientes; i++);
         {
             printf("Ingrese el DNI del cliente: ");
@@ -621,17 +617,137 @@ void mostrarUnPedido (stPedido pedido)
     }
 }
 
+/// Pasar de Archivo a Arreglo
+/*
+void archivoAarreglo ()
+{
+    /// Pasaje de Archivo a Arreglo
+
+    FILE *buffer = fopen(archivoPedidos, "rb");
+    stPedido aux;
+    int i = 0;
+    int registros = 0;
+    int validos = 0;
+
+    if (buffer != NULL)
+    {
+        fseek(buffer, 0, 2);
+        registros = ( ftell(buffer) ) / ( sizeof(stPedido) );
+    }
+    else
+    {
+        printf("El archivo no pudo ser abierto");
+    }
+
+    validos = registros;
+    stPedido pedidos[validos];
+    fseek(buffer, 0, 0);
+
+    while (i < validos)
+    {
+        fread(&aux, sizeof(stPedido), 1, buffer);
+        pedidos[i] = aux;
+    }
+
+    fclose(buffer);
+}
+*/
+
 /// Fecha ///
+
 /*
 void ordenarPorFecha ()
 {
+    /// Pasaje de Archivo a Arreglo
 
+    FILE *buffer = fopen(archivoPedidos, "rb");
+    stPedido aux;
+    int i = 0;
+    int registros = 0;
+    int validos = 0;
+
+    if (buffer != NULL)
+    {
+        fseek(buffer, 0, 2);
+        registros = ( ftell(buffer) ) / ( sizeof(stPedido) );
+    }
+    else
+    {
+        printf("El archivo no pudo ser abierto");
+    }
+
+    validos = registros;
+    stPedido pedidos[validos];
+    fseek(buffer, 0, 0);
+
+    while (i < validos)
+    {
+        fread(&aux, sizeof(stPedido), 1, buffer);
+        pedidos[i] = aux;
+    }
+
+    fclose(buffer);
+
+    /// ordenar Arreglo ///
+
+    int posmenor;
+    int aux;
+    i = 0;
+
+    while (i < validos - 1)
+    {
+        posmenor = elegirFechaMenor(pedidos, i, validos);
+        aux = pedidos[posmenor];
+        pedidos[posmenor] = pedidos[i];
+        pedidos[i] = aux;
+        i++;
+    }
 }
 
-void elegirFecha (stPedido pedidos[])
+int elegirFechaMenor (stPedido pedidos[], int pos, int validos)
 {
-    FILE *buffer = fopen(archivoPedidos, "rb");
+    int menor = pedidos[pos].diaPedido;
+    int posmenor = pos;
+    int i = pos + 1;
 
+
+    while (i < validos) /// Elige el dia menor y ordena los pedidos
+    {
+        if (menor > pedidos[i].diaPedido)
+        {
+            menor = pedidos[i];
+            posmenor = i;
+        }
+        i++
+    }
+
+    i = pos + 1;
+    menor = pedidos[pos].mesPedido;
+
+    while (i < validos) /// Vuelve a ordenar los pedidos pero ahora por mes
+    {
+        if (menor > pedidos[i].mesPedido)
+        {
+            menor = pedidos[i];
+            posmenor = i;
+        }
+        i++
+    }
+
+    i = pos + 1;
+    menor = pedidos[pos].anioPedido;
+
+    while (i < validos) /// Vuelve a ordenar los pedidos pero ahora por año
+    {
+        if (menor > pedidos[i].anioPedido)
+        {
+            menor = pedidos[i];
+            posmenor = i;
+        }
+        i++
+    }
+
+    return posmenor /// posicion en el arreglo con menor dia, mes y año
 }
 */
 /// Clientes ///
@@ -661,10 +777,10 @@ void MostrarPedidosDeUnCliente (int idCliente)
     }
 }
 
-/// Top 10 Clientes
 
+/// Top 10 Clientes ///
 /*
-void listarTop10Clientes ()
+void Top10Clientes (stPedido arreglo[], int validos)
 {
 
 }
