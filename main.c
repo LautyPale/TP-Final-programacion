@@ -25,9 +25,10 @@ void menuOpciones ()
     /// Variables Clientes ///
 
     int opcionClientes = -1, opcionListarClientes = -1;
-    int cantClientes = 0;
     int idCliente = -1;
     int DNICliente = -1;
+    int validosClientes;
+
 
     /// Variables Pedidos ///
 
@@ -75,9 +76,7 @@ void menuOpciones ()
 
                         case 1:
                         {
-                            printf("Cuantos clientes desea cargar: ");
-                            scanf("%d", &cantClientes);
-                            altaCliente(cantClientes);
+                            altaCliente();
                             break;
                         }
 
@@ -120,7 +119,8 @@ void menuOpciones ()
                             do
                             {
                                 printf("[ 1 ] Ordenar por nombre y apellido.\n");
-                                printf("[ 2 ] Ordenar por DNI\n");
+                                printf("[ 2 ] Ordenar por DNI (de menor a mayor)\n");
+                                printf("[ 3 ] Mostrar por ID\n");
 
                                 printf("Ingrese una de las opciones o 0 para salir: ");
                                 scanf("%d", &opcionListarClientes);
@@ -136,13 +136,27 @@ void menuOpciones ()
 
                                     case 1:
                                     {
-                                        /// funcion metodo insercion nombre y apellido
+                                        validosClientes = CantidadDeRegistrosEnArchivo();
+                                        stCliente arregloClientes[validosClientes];
+                                        CopiarDeArchivoAEstructura(arregloClientes);
+                                        OrdenamientoPorInsercionNombreYApellido(arregloClientes, validosClientes);
+                                        MostrarEstructuras(arregloClientes, validosClientes);
                                         break;
                                     }
 
                                     case 2:
                                     {
-                                        /// funcion metodo seleccion DNI
+                                        validosClientes = CantidadDeRegistrosEnArchivo();
+                                        stCliente arregloClientes[validosClientes];
+                                        CopiarDeArchivoAEstructura(arregloClientes);
+                                        OrdenamientoPorSeleccionDNI (arregloClientes, validosClientes);
+                                        MostrarEstructuras(arregloClientes, validosClientes);
+                                        break;
+                                    }
+
+                                    case 3:
+                                    {
+                                        MostrarArchivoClientes ();
                                         break;
                                     }
 
@@ -156,7 +170,8 @@ void menuOpciones ()
 
                         default:
                         {
-                            printf("\nEl numero ingresado no corresponde a ninguna opcion.");
+                            printf("\nEl numero ingresado no corresponde a ninguna opcion.\n");
+                            break;
                         }
 
                     }
@@ -188,10 +203,7 @@ void menuOpciones ()
 
                         case 1:
                         {
-                            printf("Ingrese el ID del cliente: ");
-                            scanf("%d", &idCliente);
-
-                            altaPedido(idCliente);
+                            altaPedido();
                             break;
                         }
 
@@ -221,8 +233,9 @@ void menuOpciones ()
                             {
                                 printf("[ 1 ] Listar Pedidos por Fecha.\n");
                                 printf("[ 2 ] Mostrar Pedidos de un cliente.\n");
-                                printf("[ 3 ] Top 10 mejores clientes.\n");
-                                printf("[ 4 ] Peor Cliente.\n");
+                                printf("[ 3 ] Mostrat todos los pedidos.\n");
+                                printf("[ 4 ] Top 10 mejores clientes.\n");
+                                printf("[ 5 ] Peor Cliente.\n");
 
                                 printf("Ingrese una opcion o 0 para salir: ");
                                 scanf("%d", &opcionListarPedidos);
@@ -238,7 +251,7 @@ void menuOpciones ()
 
                                     case 1:
                                     {
-                                        /// Funcion pedido por Fecha
+                                        ordenarPorFecha();
                                         break;
                                     }
 
@@ -254,7 +267,7 @@ void menuOpciones ()
 
                                     case 3:
                                     {
-                                        /// Funcion top 10 mejores clientes
+                                        MostrarTodosLosPedidos ();
                                         break;
                                     }
 
