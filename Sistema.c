@@ -8,6 +8,7 @@
 const char archivoClientes[] = "Clientes";
 const char archivoProductos[] = "Productos";
 const char archivoPedidos[] = "Pedidos";
+const int ANIO = 2022;
 
 ///-------------------------------------------------------------- FUNCIONES DE CLIENTES --------------------------------------------------------------///
 
@@ -30,6 +31,7 @@ void altaCliente ()
             printf("Ingrese el DNI del cliente: ");
             scanf("%d", &nuevo.dni);
 
+            fseek(buffer, sizeof(stCliente)*(i), 0);
             while ( (fread (&aux, sizeof(stCliente), 1, buffer) ) > 0 && flag == 0)
             {
                 if (nuevo.dni == aux.dni)
@@ -44,10 +46,11 @@ void altaCliente ()
             }
             else
             {
-
-                fseek(buffer, sizeof(stCliente)*(-1), SEEK_END);
-                if  ( (fread(&aux, sizeof(stCliente), 1, buffer) ) > 0 )
+                fseek(buffer, 0, 0);
+                if  ((fread(&aux, sizeof(stCliente), 1, buffer)) > 0 )
                 {
+                    fseek(buffer, sizeof(stCliente)*(-1), SEEK_END);
+                    fread(&aux, sizeof(stCliente), 1, buffer);
                     nuevo.idCliente = aux.idCliente + 1;
                 }
                 else
@@ -55,16 +58,17 @@ void altaCliente ()
                     nuevo.idCliente = 1;
                 }
 
+                fseek(buffer, sizeof(stCliente)*(i), 0);
                 nuevo = cargarCliente(nuevo);
                 fwrite(&nuevo, sizeof(stCliente), 1, buffer);
+                system("cls");
             }
         }
-        system("cls");
         fclose(buffer);
     }
     else
     {
-        printf("El archivo ya existe.");
+        printf("El archivo ya existe.\n");
     }
 }
 
@@ -248,61 +252,117 @@ int BuscarDni (FILE* buf, int dni)
 /// Listar Clientes
 
 /// Nombre y apellido (insercion)
-/*
-void InsertarDatoEnArregloOrdenadoPorNombre (stAlumno a[], int validos, stAlumno inser)
+
+void InsertarDatoEnArregloOrdenadoPorNombre (stCliente cliente[], int validos, stCliente inser)
 {
     int i=validos;
 
-    while (i>=0 && strcmpi(a[i].nombre,inser.nombre) > 0)
+    while (i>=0 && (strcmpi(cliente[i].nombre,inser.nombre))> 0)
     {
-        a[i+1]=a[i];
+        cliente[i+1]=cliente[i];
         i--;
     }
-    a[i+1] = inser;
+    while (i>=0 && (strcmpi(cliente[i].nombre,inser.nombre)) == 0)
+    {
+        if ((strcmpi(cliente[i].apellido,inser.apellido)) > 0)
+        {
+            cliente[i+1]=cliente[i];
+            i--;
+        }
+    }
+
+    cliente[i+1] = inser;
 }
 
-void OrdenamientoPorInsercion (stAlumno a[], int validos)
+void OrdenamientoPorInsercionNombreYApellido (stCliente cliente[], int validos)
 {
     int i=0;
 
     while(i<validos-1)
     {
-        InsertarDatoEnArregloOrdenadoPorNombre(a, i, a[i+1]);
+        InsertarDatoEnArregloOrdenadoPorNombre(cliente, i, cliente[i+1]);
         i++;
     }
 }
-*/
-/// DNI (seleccion)
-/*
-void OrdenarPorId ()
-{
 
+/// DNI (seleccion)
+
+stCliente CopiarDeArchivoAEstructura (stCliente clienteord[])
+{
+    FILE * buf = fopen(archivoClientes, "rb");
+    int i=0;
+    stCliente cliente;
+
+    if(!buf){
+        printf("\nEL ARCHIVO NO SE PUEDE ABRIR\n");
+    }
+    else{
+        while((fread(&cliente, sizeof(stCliente), 1, buf)) > 0){
+            clienteord[i] = cliente;
+            i++;
+        }
+        fclose(buf);
+    }
+    return cliente;
 }
 
-int BuscarPosicionMenorMatricula (int )
+int CantidadDeRegistrosEnArchivo()
 {
-    int menor = a[i].matricula;
+    FILE * buf = fopen(archivoClientes, "rb");
+    int cant;
+
+    if(!buf) {
+        printf("error");
+    } else {
+        fseek(buf,0,2);
+        cant = ftell(buf) / sizeof(stCliente);
+        fclose(buf);
+    }
+    return cant;
+}
+
+int BuscarPosicionMenorDNI (stCliente cliente[], int validos, int i)
+{
+    int menor = cliente[i].dni;
     int posmenor = i;
 
     for(i=i+1; i<validos; i++)
     {
-        if(menor > a[i].matricula)
+        if(menor > cliente[i].dni)
         {
-            menor = a[i].matricula;
+            menor = cliente[i].dni;
             posmenor = i;
         }
     }
     return posmenor;
 }
-*/
+
+void OrdenamientoPorSeleccionDNI (stCliente cliente[], int validos)
+{
+    int i=0, posmenor;
+    stCliente aux;
+
+    while(i<validos)
+    {
+        posmenor = BuscarPosicionMenorDNI(cliente, validos, i);
+
+        aux=cliente[i];                 /// GUARDO LOS DATOS DE cliente[i] EN aux PARA NO PERDER DATOS
+        cliente[i]=cliente[posmenor];   /// GUARDO EN cliente[i] LOS DATOS DE MENOR DNI
+        cliente[posmenor]=aux;          /// DEVUELVO LOS DATOS QUE HABIA EN cliente[i] AL LUGAR QUE DEJO EL DATO DE MENOR DNI
+
+        i++;
+    }
+}
+
 ///-------------------------------------------------------------- FUNCIONES DE PEDIDOS --------------------------------------------------------------///
-/*
+
 void altaPedido (int idCliente)
 {
-    FILE *bufferPedido = fopen(archivoPedidos, "rb"); /// abro el archivo de pedidos para agregar algun pedido si se cumple el while de abajo
+    FILE *bufferPedido = fopen(archivoPedidos, "a+b"); /// abro el archivo de pedidos para agregar algun pedido si se cumple el while de abajo
     FILE *bufferCliente = fopen(archivoClientes, "rb"); /// abro el archivo de clientes para comparar todos los id de clientes con el pedido por parametro
+    stPedido nuevo;
     stPedido aux;
-    stCliente buscarId;
+    stCliente buscarId; /// para comparar el id y agregar el pedido a ese cliente
     int flag = 0;
 
     while ( (fread(&buscarId, sizeof(stCliente), 1, bufferCliente) ) > 0 )
@@ -319,27 +379,306 @@ void altaPedido (int idCliente)
     {
         if (bufferPedido != NULL)
         {
-            fclose(bufferPedido);
-            bufferPedido = fopen(archivoPedidos, "ab");
 
-            aux = cargarPedido(aux);
+            fseek(bufferPedido, sizeof(stPedido)*(-1), SEEK_END);
+            if ( (fread(&aux, sizeof(stPedido), 1, bufferPedido) ) > 0 )
+            {
+                nuevo.idpedido = aux.idpedido + 1;
+            }
+            else
+            {
+                nuevo.idpedido = 1;
+            }
 
-            fwrite(&aux, sizeof(stProducto), 1, buffer);
+            nuevo.idCliente = idCliente;
+            nuevo = cargarPedido(nuevo);
+            fwrite(&nuevo, sizeof(stPedido), 1, bufferPedido);
+
             system("cls");
         }
+
+        fclose(bufferPedido);
     }
     else
     {
         printf("El cliente no existe o el ID es incorrecto");
     }
-    fclose(bufferPedido);
+
 }
 
-stPedido cargarPedido (stPedido pedido, int idCliente)
+stPedido cargarPedido (stPedido pedido)
 {
+    printf("Ingrese el costo total del pedido: ");
+    scanf("%f", &pedido.costopedido);
+
+    printf("Ingrese la descripcion del pedido:\n");
+    fflush(stdin);
+    gets(pedido.descripcion);
+
+    do
+    {
+        printf("Ingrese el anio del pedido: ");
+        scanf("%d", &pedido.anioPedido);
+        if (pedido.anioPedido < ANIO)
+        {
+            printf("El pedido no puede ser anterior al año actual");
+        }
+    } while (pedido.anioPedido < ANIO);
+
+    do
+    {
+        printf("Ingrese el mes del pedido: ");
+        scanf("%d", &pedido.mesPedido);
+        if (pedido.mesPedido < 1 || pedido.mesPedido > 12)
+        {
+            printf("Ingrese un mes del 1 al 12.");
+        }
+
+    } while (pedido.mesPedido < 1 || pedido.mesPedido > 12);
+
+    do
+    {
+        printf("Ingrese el dia del pedido: ");
+        scanf("%d", &pedido.diaPedido);
+        if (pedido.diaPedido < 1 || pedido.diaPedido > 31)
+        {
+            printf("Ingrese un dia del 1 al 31");
+        }
+    } while (pedido.diaPedido < 1 || pedido.diaPedido > 31);
+
+    pedido.pedidoanulado = 0; /// el pedido esta siendo cargado por lo que no esta anulado (0 activo, 1 anulado)
+
     return pedido;
 }
+
+int bajaPedido (int idPedido)
+{
+    FILE *buffer = fopen(archivoPedidos, "r+b");
+    stPedido aux;
+    aux.pedidoanulado = 1; /// 1 = baja
+    int flag = 0; /// flag para comprobar que existia el idPedido dado por el usuario
+
+    if (buffer != NULL)
+    {
+        while (fread(&aux, sizeof(stPedido), 1, buffer) > 0 && flag == 0)
+        {
+            if (idPedido == aux.idpedido)
+            {
+                fseek(buffer, sizeof(stPedido)*(-1), SEEK_CUR);
+                aux = darDeBajaPedido(aux);
+                fwrite(&aux, sizeof(stPedido), 1, buffer);
+                flag = 1;
+            }
+        }
+        fclose(buffer);
+    }
+
+    return flag;
+}
+
+stPedido darDeBajaPedido (stPedido pedido)
+{
+    pedido.pedidoanulado = 1; /// dar de baja pedido
+    return pedido;
+}
+
+stPedido modificarUnPedido (stPedido pedido)
+{
+    char control = 's';
+
+    printf("Modificar descripcion? s/n");
+    fflush(stdin);
+    scanf("%c", &control);
+    if (control == 's')
+    {
+        printf("Ingrese descripcion: ");
+        fflush(stdin);
+        gets(pedido.descripcion);
+    }
+
+    printf("Modificar costo? s/n");
+    fflush(stdin);
+    scanf("%c", &control);
+    if (control == 's')
+    {
+        printf("Ingrese costo: ");
+        scanf("%f", &pedido.costopedido);
+    }
+
+    printf("Modificar fecha? s/n");
+    fflush(stdin);
+    scanf("%c", &control);
+    if (control == 's')
+    {
+        do
+        {
+            printf("Ingrese el anio del pedido: ");
+            scanf("%d", &pedido.anioPedido);
+            if (pedido.anioPedido < ANIO)
+            {
+                printf("El pedido no puede ser anterior al año actual");
+            }
+        } while (pedido.anioPedido < ANIO);
+
+        do
+        {
+            printf("Ingrese el mes del pedido: ");
+            scanf("%d", &pedido.mesPedido);
+            if (pedido.mesPedido < 1 || pedido.mesPedido > 12)
+            {
+                printf("Ingrese un mes del 1 al 12.");
+            }
+
+        } while (pedido.mesPedido < 1 || pedido.mesPedido > 12);
+
+        do
+        {
+            printf("Ingrese el dia del pedido: ");
+            scanf("%d", &pedido.diaPedido);
+            if (pedido.diaPedido < 1 || pedido.diaPedido > 31)
+            {
+                printf("Ingrese un dia del 1 al 31");
+            }
+        } while (pedido.diaPedido < 1 || pedido.diaPedido > 31);
+    }
+
+    printf("Modificar id del cliente? s/n");
+    fflush(stdin);
+    scanf("%c", &control);
+    if (control == 's')
+    {
+        printf("Ingrese id del cliente: ");
+        scanf("%d", &pedido.idCliente);
+    }
+    return pedido;
+}
+
+stPedido buscarYmodificarPedido (int idPedido)
+{
+    FILE *buffer = fopen(archivoPedidos, "r+b");
+    stPedido pedido;
+    int pos = 0;
+
+    if (!buffer)
+    {
+        printf("El archivo no se puede abrir.\n");
+    }
+    else
+    {
+        pos = buscarIdPedido(buffer, idPedido);
+        fseek(buffer, sizeof(stPedido)*(pos), 0);
+        fread(&pedido, sizeof(stPedido), 1, buffer);
+
+        pedido = modificarUnPedido(pedido);
+
+        fseek(buffer, sizeof(stPedido)*(-1), 1);
+        fwrite(&pedido, sizeof(stPedido), 1, buffer);
+
+        fclose(buffer);
+    }
+    return pedido;
+}
+
+int buscarIdPedido (FILE *buffer, int idPedido)
+{
+    stPedido aux;
+    int i = 0;
+    int flag = 0;
+
+    while ( (fread(&aux, sizeof(stPedido), 1, buffer)) > 0 && flag == 0)
+    {
+        if (idPedido == aux.idpedido)
+        {
+            flag = 1;
+        }
+        i++;
+    }
+
+    return i-1;
+}
+
+/// Listar Pedidos ///
+
+void mostrarUnPedido (stPedido pedido)
+{
+    printf("\nID del pedido: %d", pedido.idpedido);
+
+    printf("\nDescripcion: %s", pedido.descripcion);
+
+    printf("\nCosto: %.2f", pedido.costopedido);
+
+    printf("\nPedido del Cliente nro: %d", pedido.idCliente);
+
+    printf("Fecha del pedido: %d/%d/%d", pedido.diaPedido, pedido.mesPedido, pedido.anioPedido);
+
+    if (pedido.pedidoanulado == 0)
+    {
+        printf("Pedido activo: SI");
+    }
+    else
+    {
+        printf("Pedido activo: NO");
+    }
+}
+
+/// Fecha ///
+/*
+void ordenarPorFecha ()
+{
+
+}
+
+void elegirFecha (stPedido pedidos[])
+{
+    FILE *buffer = fopen(archivoPedidos, "rb");
+
+}
 */
+/// Clientes ///
+
+void MostrarPedidosDeUnCliente (int idCliente)
+{
+    FILE *buffer = fopen(archivoPedidos, "rb");
+    stPedido pedido;
+    int i = 0;
+
+    if (buffer != NULL)
+    {
+        while ( (fread(&pedido, sizeof(stPedido), 1, buffer) ) > 0)
+        {
+            if (idCliente == pedido.idCliente)
+            {
+                printf("--------------Mostrando pedido %d del cliente nro: %d--------------", i+1, idCliente);
+                mostrarUnPedido(pedido);
+                i++;
+            }
+        }
+        fclose(buffer);
+    }
+    else
+    {
+        printf("El archivo no pudo ser abierto");
+    }
+}
+
+/// Top 10 Clientes
+
+/*
+void listarTop10Clientes ()
+{
+
+}
+*/
+
+/// Peor Cliente
+
+/*
+void PeorCliente ()
+{
+
+}
+*/
+
 ///-------------------------------------------------------------- FUNCIONES DE PRODUCTOS --------------------------------------------------------------///
 /*
 stProducto tiposProductos (stProducto producto)
