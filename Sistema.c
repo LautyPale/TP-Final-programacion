@@ -6,7 +6,6 @@
 ///-------------------------------------------------------------- CONSTANTES --------------------------------------------------------------///
 
 const char archivoClientes[] = "Clientes";
-const char archivoProductos[] = "Productos";
 const char archivoPedidos[] = "Pedidos";
 const int ANIO = 2022;
 
@@ -454,6 +453,8 @@ void altaPedido ()
                 }
             }
 
+            fclose(bufferClientes);
+
             if(flag == 0)
             {
                 printf("\nEl cliente no existe.\n");
@@ -482,7 +483,7 @@ void altaPedido ()
     }
     else
     {
-        printf("El archivo ya existe.");
+        printf("El archivo no pudo ser abierto.");
     }
 }
 
@@ -709,23 +710,11 @@ void mostrarUnPedido (stPedido pedido)
 
 /// Fecha ///
 
-void ordenarPorFecha ()
+void ordenarPorFecha (stPedido arregloPedidos[], int validos)
 {
-    FILE * buffer = fopen(archivoPedidos, "rb");
-
     int posmenor;
     stPedido aux;
     int i = 0;
-
-    int validos = contarRegistrosPedidos(buffer);
-    stPedido arregloPedidos[validos];
-    while (i < validos)
-    {
-        arregloPedidos[i] = CopiarPedidosAarreglo(buffer, i);
-        i++;
-    }
-
-    i = 0;
 
     while (i < validos)
     {
@@ -735,7 +724,6 @@ void ordenarPorFecha ()
         arregloPedidos[i] = aux;
         i++;
     }
-    fclose(buffer);
 }
 
 int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
@@ -771,7 +759,18 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
     return posmenor;
 }
 
-/// Clientes ///
+void mostrarArregloPedidos(stPedido pedido[], int validos)
+{
+    int i = 0;
+    while (i < validos)
+    {
+        mostrarUnPedido (pedido[i]);
+        i++;
+    }
+}
+
+
+/// Cliente ///
 
 void MostrarPedidosDeUnCliente (int idCliente)
 {
@@ -824,12 +823,12 @@ void MostrarTodosLosPedidos ()
 }
 
 /// Top 10 Clientes ///
-/*
+
 void Top10Clientes (stPedido arreglo[], int validos)
 {
 
 }
-*/
+
 
 /// Peor Cliente
 
@@ -844,34 +843,37 @@ void PeorCliente ()
 
 /// Pasar de archivo de pedidos a arreglo de pedidos para ordenar
 
-int contarRegistrosPedidos (FILE *buffer)
+int CantidadDeRegistrosPedidos()
 {
-    stPedido aux;
-    int i = 0;
+    FILE * buffer = fopen(archivoPedidos, "rb");
+    int cant;
 
-    if (!buffer)
-    {
-        printf("\nEl archivo no se pudo abrir.\n");
+    if(!buffer) {
+        printf("error");
+    } else {
+        fseek(buffer,0,2);
+        cant = ftell(buffer) / sizeof(stPedido);
+        fclose(buffer);
     }
-    else
-    {
-        while ( (fread(&aux, sizeof(stPedido), 1, buffer) ) > 0)
-        {
-            i++;
-        }
-    }
-
-    return i;
+    return cant;
 }
 
-stPedido CopiarPedidosAarreglo (FILE *buffer, int i)
+void CopiarPedidosAarreglo (stPedido pedidos[], int validos)
 {
+    FILE *buffer = fopen(archivoPedidos, "rb");
     stPedido pedido;
+    int i = 0;
 
-    fseek(buffer, (sizeof(stPedido)*i), 0);
-    fread(&pedido, sizeof(stPedido), 1, buffer);
-
-    return pedido;
+    if(!buffer){
+        printf("\nEL ARCHIVO NO SE PUEDE ABRIR\n");
+    }
+    else{
+        while((fread(&pedido, sizeof(stPedido), 1, buffer)) > 0){
+            pedidos[i] = pedido;
+            i++;
+        }
+        fclose(buffer);
+    }
 }
 
 /// Pasar de archivo de clientes a arreglo de clientes para ordenar

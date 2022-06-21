@@ -27,13 +27,14 @@ void menuOpciones ()
     int opcionClientes = -1, opcionListarClientes = -1;
     int idCliente = -1;
     int DNICliente = -1;
-    int validosClientes;
+    int validosClientes = 0;
 
 
     /// Variables Pedidos ///
 
     int opcionPedidos = -1, opcionListarPedidos = -1;
     int idPedido = -1;
+    int validosPedidos = 0;
 
     do
     {
@@ -163,6 +164,7 @@ void menuOpciones ()
                                     default:
                                     {
                                         printf("\nEl numero ingresado no corresponde a ninguna opcion.\n");
+                                        break;
                                     }
                                 }
                             } while (opcionListarClientes != 0);
@@ -251,7 +253,11 @@ void menuOpciones ()
 
                                     case 1:
                                     {
-                                        ordenarPorFecha();
+                                        validosPedidos = CantidadDeRegistrosPedidos();
+                                        stPedido arregloPedidos[validosPedidos];
+                                        CopiarPedidosAarreglo(arregloPedidos, validosPedidos);
+                                        ordenarPorFecha(arregloPedidos, validosPedidos);
+                                        mostrarArregloPedidos(arregloPedidos, validosPedidos);
                                         break;
                                     }
 
@@ -280,6 +286,7 @@ void menuOpciones ()
                                     default:
                                     {
                                         printf("\nEl numero ingresado no corresponde a ninguna opcion.\n");
+                                        break;
                                     }
                                 }
 
@@ -289,6 +296,7 @@ void menuOpciones ()
                         default:
                         {
                             printf("\nEl numero ingresado no corresponde a ninguna opcion.\n");
+                            break;
                         }
 
                     }
@@ -299,6 +307,7 @@ void menuOpciones ()
             default:
             {
                 printf("\nEl numero ingresado no corresponde a ninguna opcion.\n");
+                break;
             }
 
         }
