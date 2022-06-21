@@ -302,16 +302,28 @@ void MostrarArchivoClientes (){
 
 void InsertarDatoEnArregloOrdenadoPorNombre (stCliente cliente[], int validos, stCliente inser)
 {
-    int i=validos;
-
-    while (i>=0 && (strcmpi(cliente[i].nombre,inser.nombre))> 0)
+    stCliente aux;
+    int i = validos;
+    while (i >= 0 && (strcmpi(cliente[i].nombre,inser.nombre))> 0)
     {
         cliente[i+1]=cliente[i];
         i--;
     }
-    while (i>=0 && (strcmpi(cliente[i].nombre,inser.nombre)) == 0)
+    while (i >= 0 && (strcmpi(cliente[i].nombre,inser.nombre)) == 0)
     {
-        if ((strcmpi(cliente[i].apellido,inser.apellido)) > 0)
+        if ( ( strcmpi(cliente[i].apellido,inser.apellido) ) > 0)
+        {
+            cliente[i+1]=cliente[i];
+            i--;
+        }
+        else if ( ( strcmpi(cliente[i].apellido,inser.apellido) ) < 0)
+        {
+            aux = cliente[i+1];
+            cliente[i+1] = cliente[i];
+            cliente[i] = aux;
+            i--;
+        }
+        else
         {
             cliente[i+1]=cliente[i];
             i--;
@@ -324,7 +336,6 @@ void InsertarDatoEnArregloOrdenadoPorNombre (stCliente cliente[], int validos, s
 void OrdenamientoPorInsercionNombreYApellido (stCliente cliente[], int validos)
 {
     int i=0;
-
     while(i<validos-1)
     {
         InsertarDatoEnArregloOrdenadoPorNombre(cliente, i, cliente[i+1]);
@@ -403,58 +414,72 @@ void OrdenamientoPorSeleccionDNI (stCliente cliente[], int validos)
 
 ///-------------------------------------------------------------- FUNCIONES DE PEDIDOS --------------------------------------------------------------///
 
-void altaPedido (int idCliente)
+void altaPedido ()
 {
-    FILE *bufferPedido = fopen(archivoPedidos, "a+b"); /// abro el archivo de pedidos para agregar algun pedido si se cumple el while de abajo
-    FILE *bufferCliente = fopen(archivoClientes, "rb"); /// abro el archivo de clientes para comparar todos los id de clientes con el pedido por parametro
+    FILE *buffer = fopen(archivoPedidos, "a+b");
+    FILE *bufferClientes = fopen(archivoClientes, "rb");
+    stCliente aux;
     stPedido nuevo;
-    stPedido aux;
-    stCliente buscarId; /// para comparar el id y agregar el pedido a ese cliente
+    stPedido aux2;
+    int cantPedidos = 0;
+    int i = 0;
     int flag = 0;
 
-    while ( (fread(&buscarId, sizeof(stCliente), 1, bufferCliente) ) > 0 )
+    if (buffer)
     {
-        if ( buscarId.idCliente == idCliente )
+        printf("Cuantos pedidos desea cargar: ");
+        scanf("%d", &cantPedidos);
+
+        for (i = 0; i < cantPedidos; i++)
         {
-            flag = 1;
-        }
-    }
+            printf("Ingrese el ID del cliente: ");
+            scanf("%d", &nuevo.idCliente);
 
-    fclose(bufferCliente);
-
-    if (flag == 1)
-    {
-        if (bufferPedido != NULL)
-        {
-
-            fseek(bufferPedido, sizeof(stPedido)*(-1), SEEK_END);
-            if ( (fread(&aux, sizeof(stPedido), 1, bufferPedido) ) > 0 )
+            fseek(bufferClientes, 0, 0);
+            while ( (fread (&aux, sizeof(stCliente), 1, bufferClientes) ) > 0 && flag == 0)
             {
-                nuevo.idpedido = aux.idpedido + 1;
+                if (nuevo.idCliente == aux.idCliente)
+                {
+                    flag = 1;
+                }
+            }
+
+            if(flag == 0)
+            {
+                printf("\nEl cliente no existe.\n");
             }
             else
             {
-                nuevo.idpedido = 1;
+                fseek(buffer, 0, 0);
+                if  ((fread(&aux, sizeof(stPedido), 1, buffer)) > 0 )
+                {
+                    fseek(buffer, sizeof(stPedido)*(-1), SEEK_END);
+                    fread(&aux2, sizeof(stPedido), 1, buffer);
+                    nuevo.idpedido = aux2.idpedido + 1;
+                }
+                else
+                {
+                    nuevo.idpedido = 1;
+                }
+
+                fseek(buffer, sizeof(stPedido)*(i), 0);
+                nuevo = cargarPedido(nuevo);
+                fwrite(&nuevo, sizeof(stPedido), 1, buffer);
+                system("cls");
             }
-
-            nuevo.idCliente = idCliente;
-            nuevo = cargarPedido(nuevo);
-            fwrite(&nuevo, sizeof(stPedido), 1, bufferPedido);
-
-            system("cls");
         }
-
-        fclose(bufferPedido);
+        fclose(buffer);
     }
     else
     {
-        printf("El cliente no existe o el ID es incorrecto");
+        printf("El archivo ya existe.");
     }
-
 }
 
 stPedido cargarPedido (stPedido pedido)
 {
+    printf("------------------------- Cargar nuevo pedido -------------------------\n");
+
     printf("Ingrese el costo total del pedido: ");
     scanf("%f", &pedido.costopedido);
 
@@ -468,7 +493,7 @@ stPedido cargarPedido (stPedido pedido)
         scanf("%d", &pedido.anioPedido);
         if (pedido.anioPedido < ANIO)
         {
-            printf("El pedido no puede ser anterior al año actual");
+            printf("\nEl pedido no puede ser anterior al año actual.\n");
         }
     } while (pedido.anioPedido < ANIO);
 
@@ -478,7 +503,7 @@ stPedido cargarPedido (stPedido pedido)
         scanf("%d", &pedido.mesPedido);
         if (pedido.mesPedido < 1 || pedido.mesPedido > 12)
         {
-            printf("Ingrese un mes del 1 al 12.");
+            printf("\nIngrese un mes del 1 al 12.\n");
         }
 
     } while (pedido.mesPedido < 1 || pedido.mesPedido > 12);
@@ -489,7 +514,7 @@ stPedido cargarPedido (stPedido pedido)
         scanf("%d", &pedido.diaPedido);
         if (pedido.diaPedido < 1 || pedido.diaPedido > 31)
         {
-            printf("Ingrese un dia del 1 al 31");
+            printf("\nIngrese un dia del 1 al 31.\n");
         }
     } while (pedido.diaPedido < 1 || pedido.diaPedido > 31);
 
@@ -648,6 +673,8 @@ int buscarIdPedido (FILE *buffer, int idPedido)
 
 void mostrarUnPedido (stPedido pedido)
 {
+    printf("\n------------------------------------------------------------------");
+
     printf("\nID del pedido: %d", pedido.idpedido);
 
     printf("\nDescripcion: %s", pedido.descripcion);
@@ -656,16 +683,18 @@ void mostrarUnPedido (stPedido pedido)
 
     printf("\nPedido del Cliente nro: %d", pedido.idCliente);
 
-    printf("Fecha del pedido: %d/%d/%d", pedido.diaPedido, pedido.mesPedido, pedido.anioPedido);
+    printf("\nFecha del pedido: %d/%d/%d", pedido.diaPedido, pedido.mesPedido, pedido.anioPedido);
 
     if (pedido.pedidoanulado == 0)
     {
-        printf("Pedido activo: SI");
+        printf("\nPedido activo: SI");
     }
     else
     {
-        printf("Pedido activo: NO");
+        printf("\nPedido activo: NO");
     }
+
+    printf("\n------------------------------------------------------------------\n");
 }
 
 /// Fecha ///
@@ -683,7 +712,10 @@ void ordenarPorFecha ()
     while (i < validos)
     {
         arregloPedidos[i] = CopiarPedidosAarreglo(buffer, i);
+        i++;
     }
+
+    i = 0;
 
     while (i < validos)
     {
@@ -756,6 +788,30 @@ void MostrarPedidosDeUnCliente (int idCliente)
     }
 }
 
+void MostrarTodosLosPedidos ()
+{
+    FILE *buffer = fopen(archivoPedidos, "rb");
+    stPedido pedido;
+    char continuar = 'n';
+
+    if (buffer != NULL)
+    {
+        while ( (fread(&pedido, sizeof(stPedido), 1, buffer) ) > 0)
+        {
+            mostrarUnPedido(pedido);
+        }
+        fclose(buffer);
+    }
+    else
+    {
+        printf("El archivo no pudo ser abierto");
+    }
+
+    printf("Ingrese c para continuar: ");
+    fflush(stdin);
+    scanf("%c", &continuar);
+    system("cls");
+}
 
 /// Top 10 Clientes ///
 /*
@@ -848,54 +904,3 @@ stCliente CopiarClientesAarreglo (stCliente clienteord[])
     }
     return cliente;
 }
-
-///-------------------------------------------------------------- FUNCIONES DE PRODUCTOS --------------------------------------------------------------///
-/*
-stProducto tiposProductos (stProducto producto)
-{
-    printf("Ingrese el nombre del producto: ");
-    fflush(stdin);
-    gets(producto.nombreproducto);
-
-    printf("Ingrese el ID del producto: ");
-    scanf("%d", &producto.idproducto);
-
-    printf("Ingrese el precio del producto: ");
-    scanf("%f", &producto.precioproducto);
-
-    return producto;
-}
-
-void crearProducto ()
-{
-    FILE *buffer = fopen(archivoProductos, "rb");
-    stProducto aux;
-    int cantProductos = 0;
-    int i = 0;
-
-    if (buffer != NULL)
-    {
-        fclose(buffer);
-
-        buffer = fopen(archivoClientes, "ab");
-
-        printf("Cuantos productos desea cargar: ");
-        scanf("%d", &cantProductos);
-
-        for (i = 0; i < cantClientes; i++);
-        {
-            printf("Ingrese los datos del producto %d:", i+1);
-            aux = tiposProductos(aux);
-            fwrite(&aux, sizeof(stProducto), 1, buffer);
-            system("cls");
-        }
-    }
-    else
-    {
-        printf("El archivo ya existe.")
-
-    }
-    fclose(buffer);
-}
-*/
-

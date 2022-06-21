@@ -20,12 +20,6 @@ int bajaCliente; /// 0 activo, 1 dado de baja.
 }stCliente;
 
 typedef struct{
-char nombreproducto[30];
-int idproducto;
-float precioproducto;
-}stProducto;
-
-typedef struct{
 char descripcion[70];
 float costopedido;
 int idpedido;
@@ -39,7 +33,7 @@ int idCliente; /// para poder listar todos los pedidos de un cliente en especifi
 ///-------------------------------------------------------------- Prototipado --------------------------------------------------------------///
 
 /// Clientes ///
-void altaCliente (int cantClientes);
+void altaCliente ();
 stCliente cargarCliente();
 int bajaCliente (int idCliente);
 stCliente ModificarUnClienteAuxiliar (stCliente cliente);
@@ -47,9 +41,20 @@ int BuscarYModificarUnCliente (int dni);
 int BuscarDni (FILE* buf, int dni);
 stCliente darDeBaja (stCliente cliente);
 
+void MostrarEstructuras (stCliente cliente[], int validos);
+void MostrarUnCliente (stCliente aux);
+void MostrarArchivoClientes ();
+void InsertarDatoEnArregloOrdenadoPorNombre (stCliente cliente[], int validos, stCliente inser);
+void OrdenamientoPorInsercionNombreYApellido (stCliente cliente[], int validos);
+stCliente CopiarDeArchivoAEstructura (stCliente clienteord[]);
+int CantidadDeRegistrosEnArchivo();
+int BuscarPosicionMenorDNI (stCliente cliente[], int validos, int i);
+void OrdenamientoPorSeleccionDNI (stCliente cliente[], int validos);
+
+
 /// Pedidos ///
 
-void altaPedido (int idCliente);
+void altaPedido ();
 stPedido cargarPedido (stPedido pedido);
 int bajaPedido (int idPedido);
 stPedido darDeBajaPedido (stPedido pedido);
@@ -61,3 +66,5 @@ void MostrarPedidosDeUnCliente (int idCliente);
 int contarRegistrosPedidos (FILE *buffer);
 int fechaMenor (stPedido arregloPedidos[], int pos, int validos);
 stPedido CopiarPedidosAarreglo (FILE *buffer, int i);
+void MostrarTodosLosPedidos ();
+void ordenarPorFecha();
