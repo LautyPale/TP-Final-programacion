@@ -255,6 +255,7 @@ void menuOpciones ()
                                         CopiarPedidosAarreglo(arregloPedidos, validosPedidos);
                                         ordenarPorFecha(arregloPedidos, validosPedidos);
                                         mostrarArregloPedidos(arregloPedidos, validosPedidos);
+                                        continuar ();
                                         break;
                                     }
 
@@ -265,20 +266,30 @@ void menuOpciones ()
 
                                         MostrarPedidosDeUnCliente(idCliente);
                                         idCliente = -1;
+                                        continuar ();
                                         break;
                                     }
 
                                     case 3:
                                     {
+<<<<<<< HEAD
                                         MostrarArchivoPedidos ();
+=======
+                                        MostrarTodosLosPedidos ();
+                                        continuar ();
+>>>>>>> 9eb6bb49843d305ddafaff46d75ce8e88c266ccb
                                         break;
                                     }
 
                                     case 4:
                                     {
-                                        /// Funcion peor Cliente
+                                        /// Funcion Top 10
+                                        continuar ();
                                         break;
                                     }
+
+                                    case 5:
+
 
                                     default:
                                     {

@@ -17,6 +17,7 @@ char calleDireccion[50];
 int calleNumero;
 int idCliente;
 int bajaCliente; /// 0 activo, 1 dado de baja.
+int cantPedidos;
 }stCliente;
 
 typedef struct{
@@ -31,6 +32,10 @@ int idCliente; /// para poder listar todos los pedidos de un cliente en especifi
 }stPedido;
 
 ///-------------------------------------------------------------- Prototipado --------------------------------------------------------------///
+
+/// Menu Opciones ///
+
+void continuar ();
 
 /// Clientes ///
 void altaCliente ();
@@ -70,4 +75,9 @@ void MostrarTodosLosPedidos ();
 void ordenarPorFecha (stPedido arregloPedidos[], int validos);
 void mostrarArregloPedidos(stPedido pedido[], int validos);
 int CantidadDeRegistrosPedidos();
+<<<<<<< HEAD
 void MostrarArchivoPedidos ();
+=======
+void Top10Clientes (stCliente arregloClientes[], int validos);
+int posicionMayor (stCliente arregloClientes[], int pos, int validos);
+>>>>>>> 9eb6bb49843d305ddafaff46d75ce8e88c266ccb
