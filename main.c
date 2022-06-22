@@ -272,12 +272,9 @@ void menuOpciones ()
 
                                     case 3:
                                     {
-<<<<<<< HEAD
-                                        MostrarTodosLosPedidos ();
-                                        continuar ();
-=======
                                         MostrarArchivoPedidos ();
->>>>>>> c2c40cb54e30de7cbae657fbad45aa8359bad0c1
+                                        continuar ();
+
                                         break;
                                     }
 
