@@ -263,17 +263,7 @@ void MostrarEstructuras (stCliente cliente[], int validos){
     int i=0;
 
     for(i=0; i<validos; i++){
-
-        printf("-------------------------------------\n");
-        printf("          ID: %i\n", cliente[i].idCliente);
-        printf("      NOMBRE: %s\n", cliente[i].nombre);
-        printf("    APELLIDO: %s\n", cliente[i].apellido);
-        printf("         DNI: %i\n", cliente[i].dni);
-        printf("      E-MAIL: %s\n", cliente[i].mail);
-        printf("       CALLE: %s\n", cliente[i].calleDireccion);
-        printf("DIRECCION Nº: %i\n", cliente[i].calleNumero);
-        printf("    TELEFONO: %lu\n", cliente[i].telefono);
-        printf("-------------------------------------\n");
+        MostrarUnCliente(cliente[i]);
     }
 }
 
@@ -449,6 +439,12 @@ void altaPedido ()
             {
                 if (nuevo.idCliente == aux.idCliente)
                 {
+                    fseek(bufferClientes, 0, 0);
+                    if ( (fread(&aux, sizeof(stCliente), 1, bufferClientes) ) > 0)
+                    {
+                        fseek(bufferClientes, sizeof(stPedido)*(-1), 2);
+                        fread(&aux, sizeof(stCliente), 1, bufferClientes);
+                    }
                     flag = 1;
                 }
             }
