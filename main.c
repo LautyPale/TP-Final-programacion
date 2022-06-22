@@ -29,6 +29,7 @@ void menuOpciones ()
     int DNICliente = -1;
     stCliente arregloClientes[1000];
     int validosClientes = 0;
+    stCliente ClienteAux;
 
 
     /// Variables Pedidos ///
@@ -36,6 +37,7 @@ void menuOpciones ()
     int opcionPedidos = -1, opcionListarPedidos = -1;
     int idPedido = -1;
     int validosPedidos = 0;
+    stPedido arregloPedidos[1000];
 
     do
     {
@@ -142,6 +144,7 @@ void menuOpciones ()
                                         CopiarDeArchivoAEstructura(arregloClientes);
                                         OrdenamientoPorInsercionNombreYApellido(arregloClientes, validosClientes);
                                         MostrarEstructuras(arregloClientes, validosClientes);
+                                        continuar ();
                                         break;
 
                                     case 2:
@@ -151,11 +154,13 @@ void menuOpciones ()
                                         CopiarDeArchivoAEstructura(arregloClientes);
                                         OrdenamientoPorSeleccionDNI (arregloClientes, validosClientes);
                                         MostrarEstructuras(arregloClientes, validosClientes);
+                                        continuar ();
                                         break;
 
                                     case 3:
 
                                         MostrarArchivoClientes ();
+                                        continuar ();
                                         break;
 
 
@@ -244,48 +249,52 @@ void menuOpciones ()
                                 switch (opcionListarPedidos)
                                 {
                                     case 0:
-                                    {
-                                        break;
-                                    }
+
+                                    break;
+
 
                                     case 1:
-                                    {
+
                                         validosPedidos = CantidadDeRegistrosPedidos();
-                                        stPedido arregloPedidos[validosPedidos];
                                         CopiarPedidosAarreglo(arregloPedidos, validosPedidos);
                                         ordenarPorFecha(arregloPedidos, validosPedidos);
                                         mostrarArregloPedidos(arregloPedidos, validosPedidos);
                                         continuar ();
                                         break;
-                                    }
 
                                     case 2:
-                                    {
+
                                         printf("Ingrese el ID del cliente: ");
                                         scanf("%d", &idCliente);
-
                                         MostrarPedidosDeUnCliente(idCliente);
                                         idCliente = -1;
                                         continuar ();
                                         break;
-                                    }
 
                                     case 3:
-                                    {
+
                                         MostrarArchivoPedidos ();
                                         continuar ();
-
                                         break;
-                                    }
 
                                     case 4:
                                     {
+                                        validosClientes = CantidadDeRegistrosEnArchivo();
+                                        CopiarDeArchivoAEstructura(arregloClientes);
+                                        Top10Clientes(arregloClientes, validosClientes);
+                                        mostrarTop10(arregloClientes, validosClientes);
                                         /// Funcion Top 10
                                         continuar ();
                                         break;
                                     }
 
                                     case 5:
+                                    {
+                                        validosClientes = CantidadDeRegistrosEnArchivo();
+                                        CopiarDeArchivoAEstructura(arregloClientes);
+                                        ClienteAux = peorCliente(arregloClientes, validosClientes);
+                                        MostrarUnCliente(ClienteAux);
+                                    }
 
 
                                     default:

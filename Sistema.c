@@ -275,6 +275,7 @@ void MostrarUnCliente (stCliente aux){
     printf("       CALLE: %s\n", aux.calleDireccion);
     printf("DIRECCION Nº: %i\n", aux.calleNumero);
     printf("    TELEFONO: %lu\n", aux.telefono);
+    printf("     PEDIDOS: %i\n", aux.cantPedidos);
     printf("-------------------------------------\n");
 }
 
@@ -741,7 +742,7 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
 
     while (i < validos)
     {
-        for (i; i<validos; i++)
+        for (i = pos+1; i<validos; i++)
         {
             if(menor.anioPedido > arregloPedidos[i].anioPedido)
             {
@@ -749,7 +750,7 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
                 posmenor = i;
             }
         }
-        for (i=pos+1; i<validos; i++)
+        for (i = pos+1; i<validos; i++)
         {
             if(menor.anioPedido == arregloPedidos[i].anioPedido)
             {
@@ -760,7 +761,7 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
                 }
             }
         }
-        for (i=pos+1; i<validos; i++)
+        for (i = pos+1; i<validos; i++)
         {
             if(menor.mesPedido == arregloPedidos[i].mesPedido)
             {
@@ -856,6 +857,7 @@ void Top10Clientes (stCliente arregloClientes[], int validos)
         aux = arregloClientes[posmayor];
         arregloClientes[posmayor] = arregloClientes[i];
         arregloClientes[i] = aux;
+        i++;
     }
 }
 
@@ -879,12 +881,41 @@ int posicionMayor (stCliente arregloClientes[], int pos, int validos)
 
 /// Peor Cliente
 
-/*
-void PeorCliente ()
+stCliente peorCliente (stCliente arregloClientes[], int validos)
 {
+    int posmenor;
+    stCliente aux;
+    int i = 0;
 
+    while (i < validos - 1)
+    {
+        posmenor = posicionMenor(arregloClientes, i, validos);
+        aux = arregloClientes[posmenor];
+        arregloClientes[posmenor] = arregloClientes[i];
+        arregloClientes[i] = aux;
+        i++;
+    }
+
+    return arregloClientes[0];
 }
-*/
+
+int posicionMenor (stCliente arregloClientes[], int pos, int validos)
+{
+    int menor = arregloClientes[pos].cantPedidos;
+    int posmenor = pos;
+    int i = pos + 1;
+
+    while (i < validos)
+    {
+        if (menor > arregloClientes[i].cantPedidos)
+        {
+            menor = arregloClientes[i].cantPedidos;
+            posmenor = i;
+        }
+        i++;
+    }
+    return posmenor;
+}
 
 ///-------------------------------------------------------------- FUNCIONES AUXILIARES --------------------------------------------------------------///
 

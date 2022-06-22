@@ -78,4 +78,6 @@ int CantidadDeRegistrosPedidos();
 void MostrarArchivoPedidos ();
 void Top10Clientes (stCliente arregloClientes[], int validos);
 int posicionMayor (stCliente arregloClientes[], int pos, int validos);
-
+stCliente peorCliente (stCliente arregloClientes[], int validos);
+int posicionMenor (stCliente arregloClientes[], int pos, int validos);
+void mostrarTop10 (stCliente arregloClientes[], int validos);
