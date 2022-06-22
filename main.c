@@ -39,8 +39,8 @@ void menuOpciones ()
 
     do
     {
-        printf("[ 1 ] Clientes.\n");
-        printf("[ 2 ] Pedidos.\n");
+        printf("[ 1 ] Clientes\n");
+        printf("[ 2 ] Pedidos\n\n");
 
         printf("Ingrese una de las opciones o 0 para salir: ");
         scanf("%d", &opcionGeneral);
@@ -59,10 +59,10 @@ void menuOpciones ()
                 /// Clientes ///
                 do
                 {
-                    printf("[ 1 ] Alta Clientes.\n");
-                    printf("[ 2 ] Baja Clientes.\n");
-                    printf("[ 3 ] Modificar Clientes.\n");
-                    printf("[ 4 ] Listar Clientes.\n");
+                    printf("[ 1 ] Alta Clientes\n");
+                    printf("[ 2 ] Baja Clientes\n");
+                    printf("[ 3 ] Modificar Clientes\n");
+                    printf("[ 4 ] Listar Clientes\n\n");
 
                     printf("Ingrese una de las opciones o 0 para salir: ");
                     scanf("%d", &opcionClientes);
@@ -120,9 +120,9 @@ void menuOpciones ()
 
                             do
                             {
-                                printf("[ 1 ] Ordenar por nombre y apellido.\n");
+                                printf("[ 1 ] Ordenar por nombre y apellido\n");
                                 printf("[ 2 ] Ordenar por DNI (de menor a mayor)\n");
-                                printf("[ 3 ] Mostrar por ID\n");
+                                printf("[ 3 ] Mostrar por ID\n\n");
 
                                 printf("Ingrese una de las opciones o 0 para salir: ");
                                 scanf("%d", &opcionListarClientes);
@@ -187,7 +187,7 @@ void menuOpciones ()
                     printf("[ 1 ] Alta Pedidos\n");
                     printf("[ 2 ] Baja Pedidos\n");
                     printf("[ 3 ] Modificacion Pedidos\n");
-                    printf("[ 4 ] Listado y estadisticas Pedidos\n");
+                    printf("[ 4 ] Listado y estadisticas Pedidos\n\n");
 
                     printf("Ingrese una de las opciones o 0 para salir: ");
                     scanf("%d", &opcionPedidos);
@@ -230,11 +230,11 @@ void menuOpciones ()
 
                             do
                             {
-                                printf("[ 1 ] Listar Pedidos por Fecha.\n");
-                                printf("[ 2 ] Mostrar Pedidos de un cliente.\n");
-                                printf("[ 3 ] Mostrar todos los pedidos.\n");
-                                printf("[ 4 ] Top 10 mejores clientes.\n");
-                                printf("[ 5 ] Peor Cliente.\n");
+                                printf("[ 1 ] Listar Pedidos por Fecha\n");
+                                printf("[ 2 ] Mostrar Pedidos de un cliente\n");
+                                printf("[ 3 ] Mostrar todos los pedidos\n");
+                                printf("[ 4 ] Top 10 mejores clientes\n");
+                                printf("[ 5 ] Peor Cliente\n\n");
 
                                 printf("Ingrese una opcion o 0 para salir: ");
                                 scanf("%d", &opcionListarPedidos);

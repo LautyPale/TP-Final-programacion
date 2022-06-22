@@ -152,7 +152,7 @@ stCliente ModificarUnClienteAuxiliar (stCliente cliente)
     scanf("%c", &control);
     if(control=='s')
     {
-        printf("Ingrese nombre: ");
+        printf("Ingrese apellido: ");
         fflush(stdin);
         gets(cliente.apellido);
     }
@@ -220,23 +220,19 @@ int BuscarYModificarUnCliente (int dni)
     }
     else
     {
-        while ( (fread(&cliente, sizeof(stCliente), 1, buf) ) > 0 && dni != cliente.dni)
-        {
-            if (dni == cliente.dni)
-            {
-                pos = BuscarDni(buf, dni);
-                fseek(buf, sizeof(stCliente)*(pos), 0);
-                fread(&cliente, sizeof(stCliente), 1, buf);
+        pos = BuscarDni(buf, dni);
+        fseek(buf, sizeof(stCliente)*(pos), 0);
+        fread(&cliente, sizeof(stCliente), 1, buf);
 
-                cliente = ModificarUnClienteAuxiliar (cliente);
+        cliente = ModificarUnClienteAuxiliar (cliente);
 
-                fseek(buf, sizeof(stCliente)*(-1), 1);
-                fwrite(&cliente, sizeof(stCliente), 1, buf);
-                flag = 1;
-            }
-        }
-        fclose(buf);
+        fseek(buf, sizeof(stCliente)*(-1), 1);
+        fwrite(&cliente, sizeof(stCliente), 1, buf);
+        flag = 1;
     }
+
+    fclose(buf);
+
     return flag;
 }
 
@@ -302,32 +298,17 @@ void MostrarArchivoClientes (){
 
 void InsertarDatoEnArregloOrdenadoPorNombre (stCliente cliente[], int validos, stCliente inser)
 {
-    stCliente aux;
     int i = validos;
+
     while (i >= 0 && (strcmpi(cliente[i].nombre,inser.nombre))> 0)
     {
         cliente[i+1]=cliente[i];
         i--;
     }
-    while (i >= 0 && (strcmpi(cliente[i].nombre,inser.nombre)) == 0)
+    while (i >= 0 && (strcmpi(cliente[i].nombre,inser.nombre)) == 0 && (strcmpi(cliente[i].apellido,inser.apellido)) > 0)
     {
-        if ( ( strcmpi(cliente[i].apellido,inser.apellido) ) > 0)
-        {
-            cliente[i+1]=cliente[i];
-            i--;
-        }
-        else if ( ( strcmpi(cliente[i].apellido,inser.apellido) ) < 0)
-        {
-            aux = cliente[i+1];
-            cliente[i+1] = cliente[i];
-            cliente[i] = aux;
-            i--;
-        }
-        else
-        {
-            cliente[i+1]=cliente[i];
-            i--;
-        }
+        cliente[i+1]=cliente[i];
+        i--;
     }
 
     cliente[i+1] = inser;
@@ -741,7 +722,6 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
 
     while (i < validos)
     {
-
         for (i; i<validos; i++)
         {
             if(menor.anioPedido > arregloPedidos[i].anioPedido)
