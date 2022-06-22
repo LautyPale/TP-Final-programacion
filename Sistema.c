@@ -417,6 +417,7 @@ void altaPedido ()
 {
     FILE *buffer = fopen(archivoPedidos, "a+b");
     FILE *bufferClientes = fopen(archivoClientes, "rb");
+    stCliente nuevoCliente;
     stCliente aux;
     stPedido nuevo;
     stPedido aux2;
@@ -439,14 +440,26 @@ void altaPedido ()
             {
                 if (nuevo.idCliente == aux.idCliente)
                 {
-                    fseek(bufferClientes, 0, 0);
-                    if ( (fread(&aux, sizeof(stCliente), 1, bufferClientes) ) > 0)
-                    {
-                        fseek(bufferClientes, sizeof(stPedido)*(-1), 2);
-                        fread(&aux, sizeof(stCliente), 1, bufferClientes);
-                    }
                     flag = 1;
                 }
+            }
+
+            if (flag == 1)
+            {
+                fseek(bufferClientes, 0, 0);
+                if ( (fread(&aux, sizeof(stCliente), 1, bufferClientes) ) > 0)
+                {
+                    fseek(bufferClientes, sizeof(stCliente)*(-1), 2);
+                    fread(&aux, sizeof(stCliente), 1, bufferClientes);
+                    nuevoCliente.cantPedidos = aux.cantPedidos + 1;
+                }
+                else
+                {
+                    nuevoCliente.cantPedidos = 1;
+                }
+
+                fseek(bufferClientes, sizeof(stCliente)*(i-1), 0);
+                fwrite(&nuevoCliente, sizeof(stCliente), 1, bufferClientes);
             }
 
             fclose(bufferClientes);
@@ -797,7 +810,6 @@ void MostrarTodosLosPedidos ()
 {
     FILE *buffer = fopen(archivoPedidos, "rb");
     stPedido pedido;
-    char continuar = 'n';
 
     if (buffer != NULL)
     {
@@ -811,20 +823,52 @@ void MostrarTodosLosPedidos ()
     {
         printf("El archivo no pudo ser abierto");
     }
-
-    printf("Ingrese c para continuar: ");
-    fflush(stdin);
-    scanf("%c", &continuar);
-    system("cls");
 }
 
 /// Top 10 Clientes ///
 
-void Top10Clientes (stPedido arreglo[], int validos)
+void mostrarTop10 (stCliente arregloClientes[], int validos)
 {
-
+    int i = 0;
+    while (i < 10)
+    {
+        MostrarUnCliente(arregloClientes[i]);
+        i++;
+    }
 }
 
+void Top10Clientes (stCliente arregloClientes[], int validos)
+{
+    int posmayor;
+    stCliente aux;
+    int i = 0;
+
+    while (i < validos - 1)
+    {
+        posmayor = posicionMayor(arregloClientes, i, validos);
+        aux = arregloClientes[posmayor];
+        arregloClientes[posmayor] = arregloClientes[i];
+        arregloClientes[i] = aux;
+    }
+}
+
+int posicionMayor (stCliente arregloClientes[], int pos, int validos)
+{
+    int mayor = arregloClientes[pos].cantPedidos;
+    int posmayor = pos;
+    int i = pos + 1;
+
+    while (i < validos)
+    {
+        if (mayor < arregloClientes[i].cantPedidos)
+        {
+            mayor = arregloClientes[i].cantPedidos;
+            posmayor = i;
+        }
+        i++;
+    }
+    return posmayor;
+}
 
 /// Peor Cliente
 
@@ -911,4 +955,13 @@ stCliente CopiarClientesAarreglo (stCliente clienteord[])
         fclose(buf);
     }
     return cliente;
+}
+
+void continuar ()
+{
+    char continuar;
+    printf("Ingrese una tecla para continuar: ");
+    fflush(stdin);
+    scanf("%c", &continuar);
+    system("cls");
 }
