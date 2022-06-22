@@ -8,6 +8,7 @@
 const char archivoClientes[] = "Clientes";
 const char archivoPedidos[] = "Pedidos";
 const int ANIO = 2022;
+const int validosClientes = 1000;
 
 ///-------------------------------------------------------------- FUNCIONES DE CLIENTES --------------------------------------------------------------///
 
@@ -151,7 +152,7 @@ stCliente ModificarUnClienteAuxiliar (stCliente cliente)
     scanf("%c", &control);
     if(control=='s')
     {
-        printf("Ingrese nombre: ");
+        printf("Ingrese apellido: ");
         fflush(stdin);
         gets(cliente.apellido);
     }
@@ -219,23 +220,19 @@ int BuscarYModificarUnCliente (int dni)
     }
     else
     {
-        while ( (fread(&cliente, sizeof(stCliente), 1, buf) ) > 0 && dni != cliente.dni)
-        {
-            if (dni == cliente.dni)
-            {
-                pos = BuscarDni(buf, dni);
-                fseek(buf, sizeof(stCliente)*(pos), 0);
-                fread(&cliente, sizeof(stCliente), 1, buf);
+        pos = BuscarDni(buf, dni);
+        fseek(buf, sizeof(stCliente)*(pos), 0);
+        fread(&cliente, sizeof(stCliente), 1, buf);
 
-                cliente = ModificarUnClienteAuxiliar (cliente);
+        cliente = ModificarUnClienteAuxiliar (cliente);
 
-                fseek(buf, sizeof(stCliente)*(-1), 1);
-                fwrite(&cliente, sizeof(stCliente), 1, buf);
-                flag = 1;
-            }
-        }
-        fclose(buf);
+        fseek(buf, sizeof(stCliente)*(-1), 1);
+        fwrite(&cliente, sizeof(stCliente), 1, buf);
+        flag = 1;
     }
+
+    fclose(buf);
+
     return flag;
 }
 
@@ -301,32 +298,17 @@ void MostrarArchivoClientes (){
 
 void InsertarDatoEnArregloOrdenadoPorNombre (stCliente cliente[], int validos, stCliente inser)
 {
-    stCliente aux;
     int i = validos;
+
     while (i >= 0 && (strcmpi(cliente[i].nombre,inser.nombre))> 0)
     {
         cliente[i+1]=cliente[i];
         i--;
     }
-    while (i >= 0 && (strcmpi(cliente[i].nombre,inser.nombre)) == 0)
+    while (i >= 0 && (strcmpi(cliente[i].nombre,inser.nombre)) == 0 && (strcmpi(cliente[i].apellido,inser.apellido)) > 0)
     {
-        if ( ( strcmpi(cliente[i].apellido,inser.apellido) ) > 0)
-        {
-            cliente[i+1]=cliente[i];
-            i--;
-        }
-        else if ( ( strcmpi(cliente[i].apellido,inser.apellido) ) < 0)
-        {
-            aux = cliente[i+1];
-            cliente[i+1] = cliente[i];
-            cliente[i] = aux;
-            i--;
-        }
-        else
-        {
-            cliente[i+1]=cliente[i];
-            i--;
-        }
+        cliente[i+1]=cliente[i];
+        i--;
     }
 
     cliente[i+1] = inser;
@@ -354,7 +336,7 @@ stCliente CopiarDeArchivoAEstructura (stCliente clienteord[])
         printf("\nEL ARCHIVO NO SE PUEDE ABRIR\n");
     }
     else{
-        while((fread(&cliente, sizeof(stCliente), 1, buf)) > 0){
+        while((fread(&cliente, sizeof(stCliente), 1, buf)) > 0 && i < validosClientes){
             clienteord[i] = cliente;
             i++;
         }
@@ -691,6 +673,22 @@ int buscarIdPedido (FILE *buffer, int idPedido)
 
 /// Listar Pedidos ///
 
+void MostrarArchivoPedidos (){
+    FILE * buf = fopen(archivoPedidos, "rb");
+    stPedido aux;
+
+    if (!buf){
+        printf("EL ARCHIVO NO SE PUDO ABRIR\n");
+    }else{
+
+        while( (fread(&aux, sizeof(stPedido), 1, buf)) > 0)
+        {
+            mostrarUnPedido(aux);
+        }
+        fclose(buf);
+    }
+}
+
 void mostrarUnPedido (stPedido pedido)
 {
     printf("\n------------------------------------------------------------------");
@@ -724,9 +722,9 @@ void ordenarPorFecha (stPedido arregloPedidos[], int validos)
     int posmenor;
     stPedido aux;
     int i = 0;
-
+    printf("\n1");
     while (i < validos)
-    {
+    {   printf("\n2");
         posmenor = fechaMenor(arregloPedidos, i, validos);
         aux = arregloPedidos[posmenor];
         arregloPedidos[posmenor] = arregloPedidos[i];
@@ -743,19 +741,28 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
 
     while (i < validos)
     {
-        if (menor.anioPedido > arregloPedidos[i].anioPedido)
+        for (i; i<validos; i++)
         {
-            menor = arregloPedidos[i];
-            posmenor = i;
-        }
-        else if (menor.anioPedido == arregloPedidos[i].anioPedido)
-        {
-            if (menor.mesPedido > arregloPedidos[i].mesPedido)
+            if(menor.anioPedido > arregloPedidos[i].anioPedido)
             {
                 menor = arregloPedidos[i];
                 posmenor = i;
             }
-            else if (menor.mesPedido == arregloPedidos[i].mesPedido)
+        }
+        for (i=pos+1; i<validos; i++)
+        {
+            if(menor.anioPedido == arregloPedidos[i].anioPedido)
+            {
+                if (menor.mesPedido > arregloPedidos[i].mesPedido)
+                {
+                    menor = arregloPedidos[i];
+                    posmenor = i;
+                }
+            }
+        }
+        for (i=pos+1; i<validos; i++)
+        {
+            if(menor.mesPedido == arregloPedidos[i].mesPedido)
             {
                 if (menor.diaPedido > arregloPedidos[i].mesPedido)
                 {

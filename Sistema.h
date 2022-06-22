@@ -75,5 +75,9 @@ void MostrarTodosLosPedidos ();
 void ordenarPorFecha (stPedido arregloPedidos[], int validos);
 void mostrarArregloPedidos(stPedido pedido[], int validos);
 int CantidadDeRegistrosPedidos();
+<<<<<<< HEAD
 void Top10Clientes (stCliente arregloClientes[], int validos);
 int posicionMayor (stCliente arregloClientes[], int pos, int validos);
+=======
+void MostrarArchivoPedidos ();
+>>>>>>> c2c40cb54e30de7cbae657fbad45aa8359bad0c1
