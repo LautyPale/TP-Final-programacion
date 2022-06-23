@@ -18,7 +18,7 @@ void menuOpciones ()
 {
     int opcionGeneral = -1;
 
-    /// Variables Generales //7
+    /// Variables Generales ///
 
     int flag = 0;
 
@@ -29,6 +29,7 @@ void menuOpciones ()
     int DNICliente = -1;
     stCliente arregloClientes[1000];
     int validosClientes = 0;
+    stCliente ClienteAux;
 
 
     /// Variables Pedidos ///
@@ -36,6 +37,7 @@ void menuOpciones ()
     int opcionPedidos = -1, opcionListarPedidos = -1;
     int idPedido = -1;
     int validosPedidos = 0;
+    stPedido arregloPedidos[1000];
 
     do
     {
@@ -96,12 +98,13 @@ void menuOpciones ()
                                 printf("\nCliente dado de baja exitosamente.\n");
                             }
                             idCliente = -1;
+                            continuar ();
                             break;
 
 
                         case 3:
 
-                            printf("Ingrese el DNI del cliente: ");
+                            printf("Ingrese el DNI del cliente a modificar: ");
                             scanf("%d", &DNICliente);
                             flag = BuscarYModificarUnCliente(DNICliente);
                             if (flag == 0)
@@ -113,6 +116,7 @@ void menuOpciones ()
                                 printf("\nCliente modificado exitosamente.\n");
                             }
                             DNICliente = -1;
+                            continuar ();
                             break;
 
 
@@ -138,30 +142,32 @@ void menuOpciones ()
                                     case 1: ;
 
                                         validosClientes = CantidadDeRegistrosEnArchivo();
-                                        ///stCliente arregloClientes[validosClientes];
                                         CopiarDeArchivoAEstructura(arregloClientes);
                                         OrdenamientoPorInsercionNombreYApellido(arregloClientes, validosClientes);
                                         MostrarEstructuras(arregloClientes, validosClientes);
+                                        continuar ();
                                         break;
 
                                     case 2:
 
                                         validosClientes = CantidadDeRegistrosEnArchivo();
-                                        ///stCliente arregloClientes[validosClientes2];
                                         CopiarDeArchivoAEstructura(arregloClientes);
                                         OrdenamientoPorSeleccionDNI (arregloClientes, validosClientes);
                                         MostrarEstructuras(arregloClientes, validosClientes);
+                                        continuar ();
                                         break;
 
                                     case 3:
 
                                         MostrarArchivoClientes ();
+                                        continuar ();
                                         break;
 
 
                                     default:
 
                                         printf("El numero ingresado no corresponde a ninguna opcion.\n\n");
+                                        continuar ();
                                         break;
 
                                 }
@@ -171,6 +177,7 @@ void menuOpciones ()
                         default:
 
                             printf("El numero ingresado no corresponde a ninguna opcion.\n\n");
+                            continuar ();
                             break;
 
 
@@ -204,6 +211,8 @@ void menuOpciones ()
                         case 1:
 
                             altaPedido();
+                            printf("El/los pedido/s han sido cargado/s exitosamente.\n");
+                            continuar ();
                             break;
 
                         case 2:
@@ -213,6 +222,7 @@ void menuOpciones ()
 
                             bajaPedido(idPedido);
                             idPedido = -1;
+                            continuar ();
                             break;
 
 
@@ -223,6 +233,7 @@ void menuOpciones ()
 
                             buscarYmodificarPedido(idPedido);
                             idPedido = -1;
+                            continuar ();
                             break;
 
 
@@ -244,68 +255,69 @@ void menuOpciones ()
                                 switch (opcionListarPedidos)
                                 {
                                     case 0:
-                                    {
-                                        break;
-                                    }
+
+                                    break;
+
 
                                     case 1:
-                                    {
+
                                         validosPedidos = CantidadDeRegistrosPedidos();
-                                        stPedido arregloPedidos[validosPedidos];
                                         CopiarPedidosAarreglo(arregloPedidos, validosPedidos);
                                         ordenarPorFecha(arregloPedidos, validosPedidos);
                                         mostrarArregloPedidos(arregloPedidos, validosPedidos);
                                         continuar ();
                                         break;
-                                    }
 
                                     case 2:
-                                    {
+
                                         printf("Ingrese el ID del cliente: ");
                                         scanf("%d", &idCliente);
-
                                         MostrarPedidosDeUnCliente(idCliente);
                                         idCliente = -1;
                                         continuar ();
                                         break;
-                                    }
 
                                     case 3:
-                                    {
-<<<<<<< HEAD
+
                                         MostrarArchivoPedidos ();
-=======
-                                        MostrarTodosLosPedidos ();
                                         continuar ();
->>>>>>> 9eb6bb49843d305ddafaff46d75ce8e88c266ccb
+
                                         break;
-                                    }
 
                                     case 4:
-                                    {
-                                        /// Funcion Top 10
+
+                                        validosClientes = CantidadDeRegistrosEnArchivo();
+                                        CopiarDeArchivoAEstructura(arregloClientes);
+                                        Top10Clientes(arregloClientes, validosClientes);
+                                        mostrarTop10(arregloClientes, validosClientes);
                                         continuar ();
                                         break;
-                                    }
 
                                     case 5:
 
+                                        validosClientes = CantidadDeRegistrosEnArchivo();
+                                        CopiarDeArchivoAEstructura(arregloClientes);
+                                        ClienteAux = peorCliente(arregloClientes, validosClientes);
+                                        MostrarUnCliente(ClienteAux);
+                                        continuar ();
+                                        break;
 
                                     default:
-                                    {
+
                                         printf("El numero ingresado no corresponde a ninguna opcion.\n\n");
+                                        continuar ();
                                         break;
-                                    }
+
                                 }
 
                             } while (opcionListarPedidos != 0);
                             break;
 
                         default:
-                        {
+
                             printf("El numero ingresado no corresponde a ninguna opcion.\n\n");
                             break;
-                        }
+
 
                     }
 
@@ -315,9 +327,8 @@ void menuOpciones ()
             default:
 
                 printf("El numero ingresado no corresponde a ninguna opcion.\n\n");
+                continuar ();
                 break;
-
-
         }
 
     } while (opcionGeneral != 0);

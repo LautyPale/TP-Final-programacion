@@ -55,7 +55,7 @@ void altaCliente ()
                     nuevo.idCliente = 1;
                 }
 
-                fseek(buffer, sizeof(stCliente)*(i), 0);
+                fseek(buffer, sizeof(stCliente)*(i), 0); /// POSICIONA EL CURSOR DESPUES DEL ULTIMO CLIENTE CARGADO
                 nuevo = cargarCliente(nuevo);
                 fwrite(&nuevo, sizeof(stCliente), 1, buffer);
                 system("cls");
@@ -95,6 +95,7 @@ stCliente cargarCliente(stCliente cliente)
     scanf("%d", &cliente.calleNumero);
 
     cliente.bajaCliente = 0; /// 0 = activo
+    cliente.cantPedidos = 0;
 
     return cliente;
 }
@@ -263,6 +264,15 @@ void MostrarEstructuras (stCliente cliente[], int validos){
 
 void MostrarUnCliente (stCliente aux){
 
+    char activo[3];
+
+    if(aux.bajaCliente == 0){
+        strcpy(activo,"SI");
+    }
+    else{
+        strcpy(activo,"NO");
+    }
+
     printf("-------------------------------------\n");
     printf("          ID: %i\n", aux.idCliente);
     printf("      NOMBRE: %s\n", aux.nombre);
@@ -270,8 +280,10 @@ void MostrarUnCliente (stCliente aux){
     printf("         DNI: %i\n", aux.dni);
     printf("      E-MAIL: %s\n", aux.mail);
     printf("       CALLE: %s\n", aux.calleDireccion);
-    printf("DIRECCION Nº: %i\n", aux.calleNumero);
+    printf("DIRECCION N%c: %i\n", 167, aux.calleNumero);
     printf("    TELEFONO: %lu\n", aux.telefono);
+    printf("      ACTIVO: %s\n", activo);
+    printf("     PEDIDOS: %i\n", aux.cantPedidos);
     printf("-------------------------------------\n");
 }
 
@@ -395,7 +407,7 @@ void OrdenamientoPorSeleccionDNI (stCliente cliente[], int validos)
 void altaPedido ()
 {
     FILE *buffer = fopen(archivoPedidos, "a+b");
-    FILE *bufferClientes = fopen(archivoClientes, "rb");
+    FILE *bufferClientes = fopen(archivoClientes, "r+b");
     stCliente nuevoCliente;
     stCliente aux;
     stPedido nuevo;
@@ -415,33 +427,19 @@ void altaPedido ()
             scanf("%d", &nuevo.idCliente);
 
             fseek(bufferClientes, 0, 0);
-            while ( (fread (&aux, sizeof(stCliente), 1, bufferClientes) ) > 0 && flag == 0)
+            while ( (fread (&aux, sizeof(stCliente), 1, bufferClientes) ) > 0 && flag == 0) /// VERIFICA QUE EXISTE EL CLIENTE
             {
-                if (nuevo.idCliente == aux.idCliente)
+                if (nuevo.idCliente == aux.idCliente) /// ENCUENTRA AL CLIENTE DEL PEDIDO
                 {
+                    fseek(bufferClientes, sizeof(stCliente)*(-1), 1);
+                    fread (&nuevoCliente, sizeof(stCliente), 1, bufferClientes);
+                    nuevoCliente.cantPedidos = nuevoCliente.cantPedidos + 1; /// SUMA 1 A LA CANTIDAD DE PEDIDOS QUE TENIA
+
+                    fseek(bufferClientes, sizeof(stCliente)*(-1), 1);
+                    fwrite(&nuevoCliente, sizeof(stCliente), 1, bufferClientes);
                     flag = 1;
                 }
             }
-
-            if (flag == 1)
-            {
-                fseek(bufferClientes, 0, 0);
-                if ( (fread(&aux, sizeof(stCliente), 1, bufferClientes) ) > 0)
-                {
-                    fseek(bufferClientes, sizeof(stCliente)*(-1), 2);
-                    fread(&aux, sizeof(stCliente), 1, bufferClientes);
-                    nuevoCliente.cantPedidos = aux.cantPedidos + 1;
-                }
-                else
-                {
-                    nuevoCliente.cantPedidos = 1;
-                }
-
-                fseek(bufferClientes, sizeof(stCliente)*(i-1), 0);
-                fwrite(&nuevoCliente, sizeof(stCliente), 1, bufferClientes);
-            }
-
-            fclose(bufferClientes);
 
             if(flag == 0)
             {
@@ -450,7 +448,7 @@ void altaPedido ()
             else
             {
                 fseek(buffer, 0, 0);
-                if  ((fread(&aux, sizeof(stPedido), 1, buffer)) > 0 )
+                if  ((fread(&aux2, sizeof(stPedido), 1, buffer)) > 0 )
                 {
                     fseek(buffer, sizeof(stPedido)*(-1), SEEK_END);
                     fread(&aux2, sizeof(stPedido), 1, buffer);
@@ -466,8 +464,10 @@ void altaPedido ()
                 fwrite(&nuevo, sizeof(stPedido), 1, buffer);
                 system("cls");
             }
+            flag = 0;
         }
         fclose(buffer);
+        fclose(bufferClientes);
     }
     else
     {
@@ -482,7 +482,7 @@ stPedido cargarPedido (stPedido pedido)
     printf("Ingrese el costo total del pedido: ");
     scanf("%f", &pedido.costopedido);
 
-    printf("Ingrese la descripcion del pedido:\n");
+    printf("Ingrese la descripcion del pedido: ");
     fflush(stdin);
     gets(pedido.descripcion);
 
@@ -689,24 +689,19 @@ void MostrarArchivoPedidos (){
 void mostrarUnPedido (stPedido pedido)
 {
     printf("\n------------------------------------------------------------------");
-
-    printf("\nID del pedido: %d", pedido.idpedido);
-
-    printf("\nDescripcion: %s", pedido.descripcion);
-
-    printf("\nCosto: %.2f", pedido.costopedido);
-
+    printf("\n         ID del pedido: %d", pedido.idpedido);
+    printf("\n           Descripcion: %s", pedido.descripcion);
+    printf("\n                 Costo: %.2f", pedido.costopedido);
     printf("\nPedido del Cliente nro: %d", pedido.idCliente);
-
-    printf("\nFecha del pedido: %d/%d/%d", pedido.diaPedido, pedido.mesPedido, pedido.anioPedido);
+    printf("\n      Fecha del pedido: %d/%d/%d", pedido.diaPedido, pedido.mesPedido, pedido.anioPedido);
 
     if (pedido.pedidoanulado == 0)
     {
-        printf("\nPedido activo: SI");
+        printf("\n         Pedido activo: SI");
     }
     else
     {
-        printf("\nPedido activo: NO");
+        printf("\n         Pedido activo: NO");
     }
 
     printf("\n------------------------------------------------------------------\n");
@@ -719,9 +714,9 @@ void ordenarPorFecha (stPedido arregloPedidos[], int validos)
     int posmenor;
     stPedido aux;
     int i = 0;
-    printf("\n1");
+
     while (i < validos)
-    {   printf("\n2");
+    {
         posmenor = fechaMenor(arregloPedidos, i, validos);
         aux = arregloPedidos[posmenor];
         arregloPedidos[posmenor] = arregloPedidos[i];
@@ -736,39 +731,43 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
     int posmenor = pos;
     int i = pos + 1;
 
-    while (i < validos)
+    for (i; i<validos; i++)
     {
-        for (i; i<validos; i++)
+        if(menor.anioPedido > arregloPedidos[i].anioPedido)
         {
-            if(menor.anioPedido > arregloPedidos[i].anioPedido)
+            menor = arregloPedidos[i];
+            posmenor = i;
+        }
+    }
+
+    i = pos + 1;
+
+    for (i; i<validos; i++)
+    {
+        if(menor.anioPedido == arregloPedidos[i].anioPedido)
+        {
+            if (menor.mesPedido > arregloPedidos[i].mesPedido)
             {
                 menor = arregloPedidos[i];
                 posmenor = i;
             }
         }
-        for (i=pos+1; i<validos; i++)
+    }
+
+    i = pos + 1;
+
+    for (i; i<validos; i++)
+    {
+        if(menor.mesPedido == arregloPedidos[i].mesPedido)
         {
-            if(menor.anioPedido == arregloPedidos[i].anioPedido)
+            if (menor.diaPedido > arregloPedidos[i].diaPedido)
             {
-                if (menor.mesPedido > arregloPedidos[i].mesPedido)
-                {
-                    menor = arregloPedidos[i];
-                    posmenor = i;
-                }
-            }
-        }
-        for (i=pos+1; i<validos; i++)
-        {
-            if(menor.mesPedido == arregloPedidos[i].mesPedido)
-            {
-                if (menor.diaPedido > arregloPedidos[i].mesPedido)
-                {
-                    menor = arregloPedidos[i];
-                    posmenor = i;
-                }
+                menor = arregloPedidos[i];
+                posmenor = i;
             }
         }
     }
+
     return posmenor;
 }
 
@@ -853,6 +852,7 @@ void Top10Clientes (stCliente arregloClientes[], int validos)
         aux = arregloClientes[posmayor];
         arregloClientes[posmayor] = arregloClientes[i];
         arregloClientes[i] = aux;
+        i++;
     }
 }
 
@@ -876,12 +876,41 @@ int posicionMayor (stCliente arregloClientes[], int pos, int validos)
 
 /// Peor Cliente
 
-/*
-void PeorCliente ()
+stCliente peorCliente (stCliente arregloClientes[], int validos)
 {
+    int posmenor;
+    stCliente aux;
+    int i = 0;
 
+    while (i < validos - 1)
+    {
+        posmenor = posicionMenor(arregloClientes, i, validos);
+        aux = arregloClientes[posmenor];
+        arregloClientes[posmenor] = arregloClientes[i];
+        arregloClientes[i] = aux;
+        i++;
+    }
+
+    return arregloClientes[0];
 }
-*/
+
+int posicionMenor (stCliente arregloClientes[], int pos, int validos)
+{
+    int menor = arregloClientes[pos].cantPedidos;
+    int posmenor = pos;
+    int i = pos + 1;
+
+    while (i < validos)
+    {
+        if (menor > arregloClientes[i].cantPedidos)
+        {
+            menor = arregloClientes[i].cantPedidos;
+            posmenor = i;
+        }
+        i++;
+    }
+    return posmenor;
+}
 
 ///-------------------------------------------------------------- FUNCIONES AUXILIARES --------------------------------------------------------------///
 
