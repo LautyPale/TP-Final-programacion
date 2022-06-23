@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
 #pragma once
 
 ///-------------------------------------------------------------- Estructuras --------------------------------------------------------------///
@@ -49,6 +48,7 @@ stCliente darDeBaja (stCliente cliente);
 void MostrarEstructuras (stCliente cliente[], int validos);
 void MostrarUnCliente (stCliente aux);
 void MostrarArchivoClientes ();
+void MostrarClientesActivosoInactivos (int opcion);
 void InsertarDatoEnArregloOrdenadoPorNombre (stCliente cliente[], int validos, stCliente inser);
 void OrdenamientoPorInsercionNombreYApellido (stCliente cliente[], int validos);
 stCliente CopiarDeArchivoAEstructura (stCliente clienteord[]);
@@ -64,12 +64,11 @@ stPedido cargarPedido (stPedido pedido);
 int bajaPedido (int idPedido);
 stPedido darDeBajaPedido (stPedido pedido);
 stPedido modificarUnPedido (stPedido pedido);
-stPedido buscarYmodificarPedido (int idPedido);
-int buscarIdPedido (FILE *buffer, int idPedido);
+int buscarYmodificarPedido (int idPedido);
+int buscarIdPedido (FILE *buffer, int idPedido, int*flag);
 void mostrarUnPedido (stPedido pedido);
 void MostrarPedidosDeUnCliente (int idCliente);
 int contarRegistrosPedidos (FILE *buffer);
-int fechaMenor (stPedido arregloPedidos[], int pos, int validos);
 void CopiarPedidosAarreglo (stPedido pedidos[], int validos);
 void MostrarTodosLosPedidos ();
 void ordenarPorFecha (stPedido arregloPedidos[], int validos);
@@ -82,4 +81,8 @@ int posicionMayor (stCliente arregloClientes[], int pos, int validos);
 stCliente peorCliente (stCliente arregloClientes[], int validos);
 int posicionMenor (stCliente arregloClientes[], int pos, int validos);
 void mostrarTop10 (stCliente arregloClientes[], int validos);
+
+int anioMenor (stPedido arregloPedidos[], int pos, int validos);
+int mesMenor (stPedido arregloPedidos[], int pos, int validos);
+int diaMenor (stPedido arregloPedidos[], int pos, int validos);
 

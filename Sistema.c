@@ -5,7 +5,7 @@
 const char archivoClientes[] = "Clientes";
 const char archivoPedidos[] = "Pedidos";
 const int ANIO = 2022;
-const int validosClientes = 1000;
+const int validosClientes = 100;
 
 ///-------------------------------------------------------------- FUNCIONES DE CLIENTES --------------------------------------------------------------///
 
@@ -15,7 +15,7 @@ void altaCliente ()
     stCliente aux;
     stCliente nuevo;
     int cantClientes = 0;
-    int i = 0;
+    int i = 0, j = 0;
     int flag = 0;
 
     if (buffer)
@@ -27,11 +27,6 @@ void altaCliente ()
 
         for (i = 0; i < cantClientes; i++)
         {
-            if (cantClientes > 1)
-            {
-                printf("-------------------- Cargando cliente %i --------------------", i + 1);
-            }
-
             printf("Ingrese el DNI del cliente: ");
             scanf("%d", &nuevo.dni);
 
@@ -63,6 +58,11 @@ void altaCliente ()
                 }
 
                 fseek(buffer, sizeof(stCliente)*(i), 0); /// POSICIONA EL CURSOR DESPUES DEL ULTIMO CLIENTE CARGADO
+                    if (cantClientes > 1)
+                    {
+                        printf("-------------------- Cargando cliente %i --------------------", j + 1);
+                        j++;
+                    }
                 nuevo = cargarCliente(nuevo);
                 fwrite(&nuevo, sizeof(stCliente), 1, buffer);
                 system("cls");
@@ -78,7 +78,6 @@ void altaCliente ()
 
 stCliente cargarCliente(stCliente cliente)
 {
-
     printf("Ingrese el nombre del cliente: ");
     fflush(stdin);
     gets(cliente.nombre);
@@ -128,7 +127,6 @@ int bajaCliente (int idCliente)
         }
         fclose(buffer);
     }
-
     return flag;
 }
 
@@ -234,11 +232,10 @@ int BuscarYModificarUnCliente (int dni)
         fseek(buf, sizeof(stCliente)*(-1), 1);
         fwrite(&cliente, sizeof(stCliente), 1, buf);
         flag = 1;
+
+        fclose(buf);
     }
-
-    fclose(buf);
-
-    return flag;
+    return flag; /// FLAG 1: CLIENTE MODIFICADO - FLAG 0: CLIENTE NO MODIFICADO
 }
 
 int BuscarDni (FILE* buf, int dni)
@@ -310,6 +307,30 @@ void MostrarArchivoClientes (){
     }
 }
 
+void MostrarClientesActivosoInactivos (int opcion)
+{
+    FILE * buf = fopen(archivoClientes, "rb");
+    stCliente aux;
+    int flag = 0;
+
+    if (!buf){
+        printf("EL ARCHIVO NO SE PUDO ABRIR\n");
+    }else{
+
+        while( (fread(&aux, sizeof(stCliente), 1, buf)) > 0)
+        {
+            if(aux.bajaCliente == opcion){
+                MostrarUnCliente(aux);
+                flag = 1;
+            }
+        }
+        if(flag == 0){
+            printf("\nNO HAY CLIENTES EN ESE ESTADO HASTA EL MOMENTO.\n\n");
+        }
+        fclose(buf);
+    }
+}
+
 /// Nombre y apellido (insercion)
 
 void InsertarDatoEnArregloOrdenadoPorNombre (stCliente cliente[], int validos, stCliente inser)
@@ -349,7 +370,7 @@ stCliente CopiarDeArchivoAEstructura (stCliente clienteord[])
     stCliente cliente;
 
     if(!buf){
-        printf("\nEL ARCHIVO NO SE PUEDE ABRIR\n");
+        printf("\nEL ARCHIVO NO SE PUEDE ABRIR.\n");
     }
     else{
         while((fread(&cliente, sizeof(stCliente), 1, buf)) > 0 && i < validosClientes){
@@ -367,7 +388,7 @@ int CantidadDeRegistrosEnArchivo()
     int cant;
 
     if(!buf) {
-        printf("error");
+        printf("\nEL ARCHIVO NO SE PUEDE ABRIR.\n");
     } else {
         fseek(buf,0,2);
         cant = ftell(buf) / sizeof(stCliente);
@@ -572,7 +593,7 @@ stPedido modificarUnPedido (stPedido pedido)
 {
     char control = 's';
 
-    printf("Modificar descripcion? s/n");
+    printf("Modificar descripcion? s/n: ");
     fflush(stdin);
     scanf("%c", &control);
     if (control == 's')
@@ -582,7 +603,7 @@ stPedido modificarUnPedido (stPedido pedido)
         gets(pedido.descripcion);
     }
 
-    printf("Modificar costo? s/n");
+    printf("Modificar costo? s/n: ");
     fflush(stdin);
     scanf("%c", &control);
     if (control == 's')
@@ -591,7 +612,7 @@ stPedido modificarUnPedido (stPedido pedido)
         scanf("%f", &pedido.costopedido);
     }
 
-    printf("Modificar fecha? s/n");
+    printf("Modificar fecha? s/n: ");
     fflush(stdin);
     scanf("%c", &control);
     if (control == 's')
@@ -602,7 +623,7 @@ stPedido modificarUnPedido (stPedido pedido)
             scanf("%d", &pedido.anioPedido);
             if (pedido.anioPedido < ANIO)
             {
-                printf("El pedido no puede ser anterior al año actual");
+                printf("El pedido no puede ser anterior al año actual\n");
             }
         } while (pedido.anioPedido < ANIO);
 
@@ -612,7 +633,7 @@ stPedido modificarUnPedido (stPedido pedido)
             scanf("%d", &pedido.mesPedido);
             if (pedido.mesPedido < 1 || pedido.mesPedido > 12)
             {
-                printf("Ingrese un mes del 1 al 12.");
+                printf("Ingrese un mes del 1 al 12.\n");
             }
 
         } while (pedido.mesPedido < 1 || pedido.mesPedido > 12);
@@ -623,27 +644,19 @@ stPedido modificarUnPedido (stPedido pedido)
             scanf("%d", &pedido.diaPedido);
             if (pedido.diaPedido < 1 || pedido.diaPedido > 31)
             {
-                printf("Ingrese un dia del 1 al 31");
+                printf("Ingrese un dia del 1 al 31.\n");
             }
         } while (pedido.diaPedido < 1 || pedido.diaPedido > 31);
-    }
-
-    printf("Modificar id del cliente? s/n");
-    fflush(stdin);
-    scanf("%c", &control);
-    if (control == 's')
-    {
-        printf("Ingrese id del cliente: ");
-        scanf("%d", &pedido.idCliente);
     }
     return pedido;
 }
 
-stPedido buscarYmodificarPedido (int idPedido)
+int buscarYmodificarPedido (int idPedido)
 {
     FILE *buffer = fopen(archivoPedidos, "r+b");
     stPedido pedido;
     int pos = 0;
+    int flag = 0;
 
     if (!buffer)
     {
@@ -651,7 +664,7 @@ stPedido buscarYmodificarPedido (int idPedido)
     }
     else
     {
-        pos = buscarIdPedido(buffer, idPedido);
+        pos = buscarIdPedido(buffer, idPedido, &flag); /// PASAMOS PUNTERO FLAG. 1 LO ENCUENTRA Y MODIFICA. 0 NO LO PUDO ENCONTRAR
         fseek(buffer, sizeof(stPedido)*(pos), 0);
         fread(&pedido, sizeof(stPedido), 1, buffer);
 
@@ -662,25 +675,24 @@ stPedido buscarYmodificarPedido (int idPedido)
 
         fclose(buffer);
     }
-    return pedido;
+    return flag; /// FLAG 1: PEDIDO MODIFICADO - FLAG 0: PEDIDO NO MODIFICADO
 }
 
-int buscarIdPedido (FILE *buffer, int idPedido)
+int buscarIdPedido (FILE *buffer, int idPedido, int*flag)
 {
     stPedido aux;
     int i = 0;
-    int flag = 0;
 
-    while ( (fread(&aux, sizeof(stPedido), 1, buffer)) > 0 && flag == 0)
+    while ( (fread(&aux, sizeof(stPedido), 1, buffer)) > 0 && (*flag) == 0)
     {
         if (idPedido == aux.idpedido)
         {
-            flag = 1;
+            (*flag) = 1;
         }
         i++;
     }
 
-    return i-1;
+    return i-1; /// DEVULEVE LA POSICION DEL PEDIDO BUSCADO, ANTES DE SER LEIDO
 }
 
 /// Listar Pedidos ///
@@ -690,7 +702,7 @@ void MostrarArchivoPedidos (){
     stPedido aux;
 
     if (!buf){
-        printf("EL ARCHIVO NO SE PUDO ABRIR\n");
+        printf("NO HAY PEDIDOS EN LA BASE DE DATOS.\n");
     }else{
 
         while( (fread(&aux, sizeof(stPedido), 1, buf)) > 0)
@@ -732,21 +744,32 @@ void ordenarPorFecha (stPedido arregloPedidos[], int validos)
 
     while (i < validos)
     {
-        posmenor = fechaMenor(arregloPedidos, i, validos);
+        posmenor = anioMenor(arregloPedidos, i, validos);
         aux = arregloPedidos[posmenor];
         arregloPedidos[posmenor] = arregloPedidos[i];
         arregloPedidos[i] = aux;
+
+        posmenor = mesMenor(arregloPedidos, i, validos);
+        aux = arregloPedidos[posmenor];
+        arregloPedidos[posmenor] = arregloPedidos[i];
+        arregloPedidos[i] = aux;
+
+        posmenor = diaMenor(arregloPedidos, i, validos);
+        aux = arregloPedidos[posmenor];
+        arregloPedidos[posmenor] = arregloPedidos[i];
+        arregloPedidos[i] = aux;
+
         i++;
     }
 }
 
-int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
+int anioMenor (stPedido arregloPedidos[], int pos, int validos)
 {
     stPedido menor = arregloPedidos[pos];
     int posmenor = pos;
     int i = pos + 1;
 
-    for (i = pos + 1; i<validos; i++)
+    for (i; i<validos; i++)
     {
         if(menor.anioPedido > arregloPedidos[i].anioPedido)
         {
@@ -754,6 +777,14 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
             posmenor = i;
         }
     }
+    return posmenor;
+}
+
+int mesMenor (stPedido arregloPedidos[], int pos, int validos)
+{
+    stPedido menor = arregloPedidos[pos];
+    int posmenor = pos;
+    int i = pos + 1;
 
     for (i = pos + 1; i<validos; i++)
     {
@@ -766,10 +797,18 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
             }
         }
     }
+    return posmenor;
+}
+
+int diaMenor (stPedido arregloPedidos[], int pos, int validos)
+{
+    stPedido menor = arregloPedidos[pos];
+    int posmenor = pos;
+    int i = pos + 1;
 
     for (i = pos + 1; i<validos; i++)
     {
-        if(menor.mesPedido == arregloPedidos[i].mesPedido)
+        if(menor.mesPedido == arregloPedidos[i].mesPedido && menor.anioPedido == arregloPedidos[i].anioPedido)
         {
             if (menor.diaPedido > arregloPedidos[i].diaPedido)
             {
@@ -778,7 +817,6 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
             }
         }
     }
-
     return posmenor;
 }
 
@@ -792,7 +830,6 @@ void mostrarArregloPedidos(stPedido pedido[], int validos)
     }
 }
 
-
 /// Cliente ///
 
 void MostrarPedidosDeUnCliente (int idCliente)
@@ -800,6 +837,7 @@ void MostrarPedidosDeUnCliente (int idCliente)
     FILE *buffer = fopen(archivoPedidos, "rb");
     stPedido pedido;
     int i = 0;
+    int flag = 0;
 
     if (buffer != NULL)
     {
@@ -810,7 +848,11 @@ void MostrarPedidosDeUnCliente (int idCliente)
                 printf("--------------Mostrando pedido %d del cliente nro: %d--------------", i+1, idCliente);
                 mostrarUnPedido(pedido);
                 i++;
+                flag = 1;
             }
+        }
+        if(flag == 0){
+            printf("\nEL CLIENTE %i NO TIENE PEDIDOS HASTA EL MOMENTO.\n\n", idCliente);
         }
         fclose(buffer);
     }
@@ -917,7 +959,6 @@ stCliente peorCliente (stCliente arregloClientes[], int validos)
             i++;
         }
     }
-
     return arregloClientes[0];
 }
 

@@ -27,6 +27,7 @@ void menuOpciones ()
     int opcionClientes = -1, opcionListarClientes = -1;
     int idCliente = -1;
     int DNICliente = -1;
+    int opcioncli = -1;
     stCliente arregloClientes[100];
     int validosClientes = 0;
     stCliente ClienteAux;
@@ -126,7 +127,8 @@ void menuOpciones ()
                             {
                                 printf("[ 1 ] Ordenar por nombre y apellido\n");
                                 printf("[ 2 ] Ordenar por DNI (de menor a mayor)\n");
-                                printf("[ 3 ] Mostrar por ID\n\n");
+                                printf("[ 3 ] Mostrar por ID\n");
+                                printf("[ 4 ] Mostrar segun estado (Act o Inac)\n\n");
 
                                 printf("Ingrese una de las opciones o 0 para salir: ");
                                 scanf("%d", &opcionListarClientes);
@@ -144,6 +146,7 @@ void menuOpciones ()
                                         validosClientes = CantidadDeRegistrosEnArchivo();
                                         CopiarDeArchivoAEstructura(arregloClientes);
                                         OrdenamientoPorInsercionNombreYApellido(arregloClientes, validosClientes);
+                                        printf("------- CLIENTES ORDENADOS POR NOMBRE Y APELLIDO -------\n\n");
                                         MostrarEstructuras(arregloClientes, validosClientes);
                                         continuar ();
                                         break;
@@ -153,23 +156,55 @@ void menuOpciones ()
                                         validosClientes = CantidadDeRegistrosEnArchivo();
                                         CopiarDeArchivoAEstructura(arregloClientes);
                                         OrdenamientoPorSeleccionDNI (arregloClientes, validosClientes);
+                                        printf("-------- CLIENTES ORDENADOS POR NUMERO DE DNI --------\n\n");
                                         MostrarEstructuras(arregloClientes, validosClientes);
                                         continuar ();
                                         break;
 
                                     case 3:
 
+                                        printf("-------- CLIENTES ORDENADOS POR ID --------\n\n");
                                         MostrarArchivoClientes ();
                                         continuar ();
                                         break;
 
+                                    case 4:
+
+                                        do
+                                        {
+                                            printf("[ 1 ] Mostrar clientes activos\n");
+                                            printf("[ 2 ] Mostrar clientes inactivos\n");
+                                            printf("\nIngrese una de las opciones o 0 para salir: ");
+                                            scanf("%i", &opcioncli);
+                                            system("cls");
+
+                                            switch (opcioncli){
+
+                                                case 0:
+                                                    break;
+                                                case 1:
+                                                    MostrarClientesActivosoInactivos (0);
+                                                    continuar();
+                                                    break;
+
+                                                case 2:
+                                                    MostrarClientesActivosoInactivos (1);
+                                                    continuar();
+                                                    break;
+
+                                                default:
+                                                    printf("El numero ingresado no corresponde a ninguna opcion.\n\n");
+                                                    continuar ();
+                                                    break;
+                                                }
+                                        }while (opcioncli != 0);
+                                        break;
 
                                     default:
 
                                         printf("El numero ingresado no corresponde a ninguna opcion.\n\n");
                                         continuar ();
                                         break;
-
                                 }
                             } while (opcionListarClientes != 0);
                             break;
@@ -194,7 +229,7 @@ void menuOpciones ()
                     printf("[ 1 ] Alta Pedidos\n");
                     printf("[ 2 ] Baja Pedidos\n");
                     printf("[ 3 ] Modificacion Pedidos\n");
-                    printf("[ 4 ] Listado y estadisticas Pedidos\n\n");
+                    printf("[ 4 ] Listado y estadisticas de pedidos\n\n");
 
                     printf("Ingrese una de las opciones o 0 para salir: ");
                     scanf("%d", &opcionPedidos);
@@ -230,12 +265,19 @@ void menuOpciones ()
 
                             printf("Ingrese el ID del pedido: ");
                             scanf("%d", &idPedido);
+                            flag = buscarYmodificarPedido(idPedido);
 
-                            buscarYmodificarPedido(idPedido);
+                            if (flag == 0)
+                            {
+                                printf("\nNo se pudo encontrar el pedido buscado o el ID es incorrecto.\n");
+                            }
+                            else
+                            {
+                                printf("\nPedido modificado exitosamente.\n");
+                            }
                             idPedido = -1;
                             continuar ();
                             break;
-
 
                         case 4:
 
@@ -279,6 +321,7 @@ void menuOpciones ()
 
                                     case 3:
 
+                                        printf("------------------- PEDIDOS EN LA BASE DE DATOS -------------------\n\n");
                                         MostrarArchivoPedidos ();
                                         continuar ();
 
