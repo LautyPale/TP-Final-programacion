@@ -23,8 +23,15 @@ void altaCliente ()
         printf("Cuantos clientes desea cargar: ");
         scanf("%d", &cantClientes);
 
+        system("cls");
+
         for (i = 0; i < cantClientes; i++)
         {
+            if (cantClientes > 1)
+            {
+                printf("-------------------- Cargando cliente %i --------------------", i + 1);
+            }
+
             printf("Ingrese el DNI del cliente: ");
             scanf("%d", &nuevo.dni);
 
@@ -421,8 +428,16 @@ void altaPedido ()
         printf("Cuantos pedidos desea cargar: ");
         scanf("%d", &cantPedidos);
 
+        system("cls");
+
         for (i = 0; i < cantPedidos; i++)
         {
+
+            if (cantPedidos > 1)
+            {
+                printf("-------------------- Cargando pedido %i --------------------\n", i + 1);
+            }
+
             printf("Ingrese el ID del cliente: ");
             scanf("%d", &nuevo.idCliente);
 
@@ -731,7 +746,7 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
     int posmenor = pos;
     int i = pos + 1;
 
-    for (i; i<validos; i++)
+    for (i = pos + 1; i<validos; i++)
     {
         if(menor.anioPedido > arregloPedidos[i].anioPedido)
         {
@@ -740,9 +755,7 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
         }
     }
 
-    i = pos + 1;
-
-    for (i; i<validos; i++)
+    for (i = pos + 1; i<validos; i++)
     {
         if(menor.anioPedido == arregloPedidos[i].anioPedido)
         {
@@ -754,9 +767,7 @@ int fechaMenor (stPedido arregloPedidos[], int pos, int validos)
         }
     }
 
-    i = pos + 1;
-
-    for (i; i<validos; i++)
+    for (i = pos + 1; i<validos; i++)
     {
         if(menor.mesPedido == arregloPedidos[i].mesPedido)
         {
@@ -833,11 +844,24 @@ void MostrarTodosLosPedidos ()
 void mostrarTop10 (stCliente arregloClientes[], int validos)
 {
     int i = 0;
-    while (i < 10)
+
+    if (validos < 10)
     {
-        MostrarUnCliente(arregloClientes[i]);
-        i++;
+        while (i < validos - 1)
+        {
+            MostrarUnCliente(arregloClientes[i]);
+            i++;
+        }
     }
+    else
+    {
+        while (i < 10)
+        {
+            MostrarUnCliente(arregloClientes[i]);
+            i++;
+        }
+    }
+
 }
 
 void Top10Clientes (stCliente arregloClientes[], int validos)
@@ -882,13 +906,16 @@ stCliente peorCliente (stCliente arregloClientes[], int validos)
     stCliente aux;
     int i = 0;
 
-    while (i < validos - 1)
+    if (validos > 1)
     {
-        posmenor = posicionMenor(arregloClientes, i, validos);
-        aux = arregloClientes[posmenor];
-        arregloClientes[posmenor] = arregloClientes[i];
-        arregloClientes[i] = aux;
-        i++;
+        while (i < validos - 1)
+        {
+            posmenor = posicionMenor(arregloClientes, i, validos);
+            aux = arregloClientes[posmenor];
+            arregloClientes[posmenor] = arregloClientes[i];
+            arregloClientes[i] = aux;
+            i++;
+        }
     }
 
     return arregloClientes[0];
@@ -990,10 +1017,12 @@ stCliente CopiarClientesAarreglo (stCliente clienteord[])
     return cliente;
 }
 
+/// continuar main ///
+
 void continuar ()
 {
     char continuar;
-    printf("Ingrese una tecla para continuar: ");
+    printf("Presione una tecla para continuar: ");
     fflush(stdin);
     scanf("%c", &continuar);
     system("cls");

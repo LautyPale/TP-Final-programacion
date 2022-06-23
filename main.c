@@ -27,7 +27,7 @@ void menuOpciones ()
     int opcionClientes = -1, opcionListarClientes = -1;
     int idCliente = -1;
     int DNICliente = -1;
-    stCliente arregloClientes[1000];
+    stCliente arregloClientes[100];
     int validosClientes = 0;
     stCliente ClienteAux;
 
@@ -37,7 +37,7 @@ void menuOpciones ()
     int opcionPedidos = -1, opcionListarPedidos = -1;
     int idPedido = -1;
     int validosPedidos = 0;
-    stPedido arregloPedidos[1000];
+    stPedido arregloPedidos[100];
 
     do
     {
