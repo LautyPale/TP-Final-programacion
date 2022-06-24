@@ -4,7 +4,7 @@
 
 const char archivoClientes[] = "Clientes";
 const char archivoPedidos[] = "Pedidos";
-const int ANIO = 2022;
+const int ANIO = 2022; /// para verificar que no se hagan pedidos anteriores a este año
 const int validosClientes = 100;
 
 ///-------------------------------------------------------------- FUNCIONES DE CLIENTES --------------------------------------------------------------///
@@ -31,7 +31,7 @@ void altaCliente ()
             scanf("%d", &nuevo.dni);
 
             fseek(buffer, sizeof(stCliente)*(i), 0);
-            while ( (fread (&aux, sizeof(stCliente), 1, buffer) ) > 0 && flag == 0)
+            while ( (fread (&aux, sizeof(stCliente), 1, buffer) ) > 0 && flag == 0) /// verifica si el DNI ingresado es de un cliente ya existente.
             {
                 if (nuevo.dni == aux.dni)
                 {
@@ -78,7 +78,7 @@ void altaCliente ()
 
 stCliente cargarCliente(stCliente cliente)
 {
-    printf("Ingrese el nombre del cliente: ");
+    printf("\nIngrese el nombre del cliente: ");
     fflush(stdin);
     gets(cliente.nombre);
 
@@ -121,7 +121,7 @@ int bajaCliente (int idCliente)
             {
                 fseek(buffer, sizeof(stCliente)*(-1), SEEK_CUR);
                 aux = darDeBaja (aux);
-                fwrite(&aux, sizeof(stCliente), 1, buffer);
+                fwrite(&aux, sizeof(stCliente), 1, buffer); /// modifica la variable cliente.bajacliente a 1 para darlo de baja
                 flag = 1;
             }
         }
@@ -441,7 +441,7 @@ void altaPedido ()
     stPedido nuevo;
     stPedido aux2;
     int cantPedidos = 0;
-    int i = 0;
+    int i = 0, j = 0;
     int flag = 0;
 
     if (buffer)
@@ -456,10 +456,10 @@ void altaPedido ()
 
             if (cantPedidos > 1)
             {
-                printf("-------------------- Cargando pedido %i --------------------\n", i + 1);
+                printf("-------------------- Cargando pedido %i --------------------\n", j + 1);
             }
 
-            printf("Ingrese el ID del cliente: ");
+            printf("Ingrese el ID del cliente: "); /// solicita el id del cliente para cargar este pedido a su lista de pedidos
             scanf("%d", &nuevo.idCliente);
 
             fseek(bufferClientes, 0, 0);
@@ -480,6 +480,7 @@ void altaPedido ()
             if(flag == 0)
             {
                 printf("\nEl cliente no existe.\n");
+                j--;
             }
             else
             {
@@ -499,6 +500,7 @@ void altaPedido ()
                 nuevo = cargarPedido(nuevo);
                 fwrite(&nuevo, sizeof(stPedido), 1, buffer);
                 system("cls");
+                j++;
             }
             flag = 0;
         }
@@ -744,17 +746,17 @@ void ordenarPorFecha (stPedido arregloPedidos[], int validos)
 
     while (i < validos)
     {
-        posmenor = anioMenor(arregloPedidos, i, validos);
+        posmenor = anioMenor(arregloPedidos, i, validos); /// primero encuentra el año menor verificando solo el año de cada pedido
         aux = arregloPedidos[posmenor];
         arregloPedidos[posmenor] = arregloPedidos[i];
         arregloPedidos[i] = aux;
 
-        posmenor = mesMenor(arregloPedidos, i, validos);
+        posmenor = mesMenor(arregloPedidos, i, validos); /// despues, encuentra el mes menor pero solo si el año de los otros pedidos coinciden con el menor anterior
         aux = arregloPedidos[posmenor];
         arregloPedidos[posmenor] = arregloPedidos[i];
         arregloPedidos[i] = aux;
 
-        posmenor = diaMenor(arregloPedidos, i, validos);
+        posmenor = diaMenor(arregloPedidos, i, validos); /// lo mismo que el anterior pero ahora verificando tambien que coincida el mes
         aux = arregloPedidos[posmenor];
         arregloPedidos[posmenor] = arregloPedidos[i];
         arregloPedidos[i] = aux;
@@ -769,7 +771,7 @@ int anioMenor (stPedido arregloPedidos[], int pos, int validos)
     int posmenor = pos;
     int i = pos + 1;
 
-    for (i; i<validos; i++)
+    for (i = pos + 1; i<validos; i++)
     {
         if(menor.anioPedido > arregloPedidos[i].anioPedido)
         {
@@ -887,7 +889,7 @@ void mostrarTop10 (stCliente arregloClientes[], int validos)
 {
     int i = 0;
 
-    if (validos < 10)
+    if (validos < 10) ///muestra hasta 10 pedidos para la funcion del top 10 de clientes
     {
         while (i < validos - 1)
         {

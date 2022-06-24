@@ -16,7 +16,7 @@ char calleDireccion[50];
 int calleNumero;
 int idCliente;
 int bajaCliente; /// 0 activo, 1 dado de baja.
-int cantPedidos;
+int cantPedidos; /// para funciones top 10 y peor cliente
 }stCliente;
 
 typedef struct{
